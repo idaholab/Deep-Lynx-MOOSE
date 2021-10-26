@@ -152,8 +152,8 @@ def writeConfigFile(configParams: dict, configFile: str):
     # Write config to file
     with open(configFile, 'w') as configfile:
         config.write(configfile)
-    if os.path.exists(configFile):
-        return True
+        if os.path.exists(configFile):
+            return True
     return False
 
 
@@ -170,7 +170,7 @@ def main():
         logging.info('Template Parser started. Using input file %s', os.getenv('INPUT_FILE_NAME'))
         configFile = getConfigFileName()
     else:
-        getConfigFileName(inputFile)
+        configFile = getConfigFileName(inputFile)
     configParams = getConfigParameters(inputFile)
     isConfigFileCreated = writeConfigFile(configParams, configFile)
     if isConfigFileCreated:
