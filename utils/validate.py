@@ -39,4 +39,3 @@ def validatePathsExist(*args):
             message = '{0}: {1}'.format('FileNotFoundError', error)
             log.error(message)
             raise error
-

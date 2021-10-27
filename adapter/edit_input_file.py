@@ -13,6 +13,7 @@ import pyhit
 import moosetree
 import mooseutils
 
+
 def createJSONData():
     """
     Creates dummy data from Deep Lynx
@@ -33,6 +34,7 @@ def createJSONData():
         "value": 200
     }]
     return jsonData
+
 
 def validateChangesToInputFile(jsonData: list):
     """
@@ -94,6 +96,7 @@ def validateChangesToInputFile(jsonData: list):
         return False
     # All json objects were validated
     return True
+
 
 def updateParameterValues(node: moosetree.Node, jsonObj: dict):
     """
@@ -167,6 +170,7 @@ def modifyInputFile(jsonData: list):
     # Write the moosetree to a file
     pyhit.write(os.getenv('RUN_FILE_NAME'), root)
 
+
 def main(jsonData=None, event=None, dlService=None):
     """
     Main entry point for script
@@ -179,8 +183,6 @@ def main(jsonData=None, event=None, dlService=None):
     isValidated = validateChangesToInputFile(jsonData)
     if isValidated:
         modifyInputFile(jsonData)
-
-
 
 
 if __name__ == '__main__':

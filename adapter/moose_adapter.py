@@ -15,6 +15,7 @@ import pyhit
 import moosetree
 import mooseutils
 
+
 def queryDeepLynx(dlService: deep_lynx.DeepLynxService):
     """
     Query Deep Lynx for data
@@ -37,20 +38,25 @@ def queryDeepLynx(dlService: deep_lynx.DeepLynxService):
             didSucceed = True
             break
         else:
-            logging.info(f'Fail: {os.getenv("QUERY_FILE_NAME")} not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds')
+            logging.info(
+                f'Fail: {os.getenv("QUERY_FILE_NAME")} not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds'
+            )
             end = time.time()
             # Break out of infinite loop
-            if end - start > float(os.getenv("QUERY_FILE_WAIT_SECONDS"))*20:
+            if end - start > float(os.getenv("QUERY_FILE_WAIT_SECONDS")) * 20:
                 logging.info(f'Fail: In the final attempt, {os.getenv("QUERY_FILE_NAME")} was not found.')
                 done = True
                 break
             # Sleep for wait seconds
             else:
-                logging.info(f'Fail: {os.getenv("QUERY_FILE_NAME")} was not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds')
+                logging.info(
+                    f'Fail: {os.getenv("QUERY_FILE_NAME")} was not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds'
+                )
                 time.sleep(os.getenv("QUERY_FILE_WAIT_SECONDS"))
     if didSucceed:
         return True
     return False
+
 
 def runInputFile():
     """
@@ -68,6 +74,7 @@ def runInputFile():
                      os.getenv('RUN_FILE_NAME'), os.getenv('IMPORT_FILE_NAME'))
         return True
     return False
+
 
 def createOutputFile():
     """
@@ -107,16 +114,20 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService, event: dict = None):
             didSucceed = True
             break
         else:
-            logging.info(f'Fail: {os.getenv("IMPORT_FILE_NAME")} not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds')
+            logging.info(
+                f'Fail: {os.getenv("IMPORT_FILE_NAME")} not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
+            )
             end = time.time()
             # Break out of infinite loop
-            if end - start > float(os.getenv("IMPORT_FILE_WAIT_SECONDS"))*20:
+            if end - start > float(os.getenv("IMPORT_FILE_WAIT_SECONDS")) * 20:
                 logging.info(f'Fail: In the final attempt, {os.getenv("IMPORT_FILE_NAME")} was not found.')
                 done = True
                 break
             # Sleep for wait seconds
             else:
-                logging.info(f'Fail: {os.getenv("IMPORT_FILE_NAME")} was not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds')
+                logging.info(
+                    f'Fail: {os.getenv("IMPORT_FILE_NAME")} was not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
+                )
                 time.sleep(os.getenv("IMPORT_FILE_WAIT_SECONDS"))
     if didSucceed:
         return True
@@ -128,8 +139,8 @@ def main(event=None, dlService=None):
     Main entry point for script
     """
 
-    logging.info('MOOSE Adapter started. Using input file %s and configuration file %s', os.getenv('CONFIG_INPUT_FILE_NAME'),
-                 os.getenv('CONFIG_FILE_NAME'))
+    logging.info('MOOSE Adapter started. Using input file %s and configuration file %s',
+                 os.getenv('CONFIG_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
     doesQueryFileExist = queryDeepLynx(dlService)
     if doesQueryFileExist:
         isRun = runInputFile()
@@ -138,7 +149,6 @@ def main(event=None, dlService=None):
         isImported = importToDeepLynx(dlService)
         return isImported
     return False
-
 
 
 if __name__ == '__main__':

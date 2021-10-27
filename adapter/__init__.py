@@ -60,7 +60,7 @@ def create_app():
     if existEnvFile and deepLynxUrl and containerName and dataSourceName:
         # instantiate deep_lynx_service
         dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
-                                    os.getenv('DATA_SOURCE_NAME'))
+                                              os.getenv('DATA_SOURCE_NAME'))
         dlService.init()
     else:
         print('Setup Error: Check logging file MOOSEAdapter.log for more information')
