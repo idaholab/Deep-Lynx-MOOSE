@@ -7,7 +7,7 @@ To run this code, first copy the `.env_sample` file and rename it to `.env`. Sev
 * CONTAINER_NAME: The container name within Deep Lynx
 * DATA_SOURCE_NAME: A name for this data source to be registered with Deep Lynx
 * PYTHONPATH: The path to the local MOOSE python folder
-* INPUT_FILE_NAME: The `.i` template input filename to look for
+* CONFIG_INPUT_FILE_NAME: The `.i` template input filename to look for
 * CONFIG_FILE_NAME: The `.cfg` configuration filename to look for
 * RUN_FILE_NAME: The `.i` input filename to run in MOOSE
 * MOOSE_OPT_PATH: The path to the local MOOSE executable

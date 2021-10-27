@@ -6,7 +6,7 @@ import time
 import datetime
 from flask import Flask, request, Response, json
 
-from deep_lynx.deep_lynx_service import DeepLynxService
+import deep_lynx
 from . import moose_adapter
 from . import settings
 
@@ -42,36 +42,6 @@ def create_app():
     else:
         logging.error('Fail: Create .env file using .env_sample as a guide.')
 
-    if os.getenv('INPUT_FILE_NAME') is not None:
-        inputFileName = True
-    else:
-        logging.error('Fail: Provide an "INPUT_FILE_NAME" variable in the .env file')
-
-    if os.getenv('CONFIG_FILE_NAME') is not None:
-        configFileName = True
-    else:
-        logging.error('Fail: Provide an "CONFIG_FILE_NAME" variable in the .env file')
-
-    if os.getenv('RUN_FILE_NAME') is not None:
-        runFileName = True
-    else:
-        logging.error('Fail: Provide an "RUN_FILE_NAME" variable in the .env file')
-
-    if os.getenv('OUTPUT_FILE_NAME') is not None:
-        outputFileName = True
-    else:
-        logging.error('Fail: Provide an "OUTPUT_FILE_NAME" variable in the .env file')
-
-    if os.getenv('PYTHONPATH') is not None:
-        pythonPath = True
-    else:
-        logging.error('Fail: Provide an "PYTHONPATH" variable in the .env file')
-
-    if os.getenv('MOOSE_OPT_PATH') is not None:
-        mooseOptPath = True
-    else:
-        logging.error('Fail: Provide an "MOOSE_OPT_PATH" variable in the .env file')
-
     if os.getenv('DEEP_LYNX_URL') is not None:
         deepLynxUrl = True
     else:
@@ -87,9 +57,9 @@ def create_app():
     else:
         logging.error('Fail: Provide an "DATA_SOURCE_NAME" variable in the .env file')
 
-    if existEnvFile and inputFileName and configFileName and runFileName and outputFileName and pythonPath and mooseOptPath and deepLynxUrl and containerName and dataSourceName:
+    if existEnvFile and deepLynxUrl and containerName and dataSourceName:
         # instantiate deep_lynx_service
-        dlService = DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
+        dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
                                     os.getenv('DATA_SOURCE_NAME'))
         dlService.init()
     else:
@@ -161,7 +131,7 @@ def create_app():
     return app
 
 
-def register_for_event(dlService: DeepLynxService, iterations=30):
+def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
     """ Register with Deep Lynx to receive data_ingested events on applicable data sources """
     registered = False
 

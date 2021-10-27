@@ -34,7 +34,7 @@ event = {
 
 def createConfigFile_scenario01():
     sys.argv = [os.path.join('adapter', 'template_parser.py')]
-    os.environ['INPUT_FILE_NAME'] = inputFilePath
+    os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
     os.environ['CONFIG_FILE_NAME'] = configFilePath
     os.environ['RUN_FILE_NAME'] = runFilePath
     didSucceed = template_parser.main()
@@ -48,7 +48,7 @@ def deleteConfigFile():
 
 
 def createConfigFile_scenario02_success():
-    os.environ['INPUT_FILE_NAME'] = "data/input_file.i"
+    os.environ['CONFIG_INPUT_FILE_NAME'] = "data/input_file.i"
     os.environ['CONFIG_FILE_NAME'] = "data/config_file.cfg"
     os.environ['RUN_FILE_NAME'] = "data/run_file.i"
     os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
@@ -57,7 +57,7 @@ def createConfigFile_scenario02_success():
 
 def createConfigFile_scenario02_fail():
     sys.argv = [os.path.join('adapter', 'template_parser.py')]
-    os.environ['INPUT_FILE_NAME'] = inputFilePath
+    os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
     os.environ['CONFIG_FILE_NAME'] = configFilePath
     os.environ['RUN_FILE_NAME'] = runFilePath
     os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'moose_test-opt')
@@ -66,11 +66,11 @@ def createConfigFile_scenario02_fail():
 
 def createConfigFile_scenario03():
     sys.argv = [os.path.join('adapter', 'template_parser.py')]
-    os.environ['INPUT_FILE_NAME'] = os.getenv("INPUT_FILE_NAME")
+    os.environ['CONFIG_INPUT_FILE_NAME'] = os.getenv("CONFIG_INPUT_FILE_NAME")
     os.environ['CONFIG_FILE_NAME'] = os.getenv("CONFIG_FILE_NAME")
     os.environ['RUN_FILE_NAME'] = os.getenv("RUN_FILE_NAME")
-    os.environ['OUTPUT_FILE_NAME'] = os.getenv("OUTPUT_FILE_NAME")
-    os.environ['OUTPUT_FILE_WAIT_SECONDS'] = '2'
+    os.environ['IMPORT_FILE_NAME'] = os.getenv("IMPORT_FILE_NAME")
+    os.environ['IMPORT_FILE_WAIT_SECONDS'] = '2'
     os.environ['PYTHONPATH'] = moose_python
     os.environ['MOOSE_OPT_PATH'] = moose_executable
     os.environ['DEEP_LYNX_URL'] = 'http://127.0.0.1:8090'
@@ -248,8 +248,8 @@ def test_getOutputFile_notExist():
     createConfigFile_scenario03()
     jsonData = moose_adapter.createJSONData()
     moose_adapter.createInputFileToRun(jsonData)
-    if os.path.isfile(os.getenv("OUTPUT_FILE_NAME")):
-        os.remove(os.getenv("OUTPUT_FILE_NAME"))
+    if os.path.isfile(os.getenv("IMPORT_FILE_NAME")):
+        os.remove(os.getenv("IMPORT_FILE_NAME"))
     isOutputFile = moose_adapter.getOutputFile()
     assert isOutputFile == False
     deleteConfigFile()

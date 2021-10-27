@@ -25,7 +25,8 @@ def getParserArguments():
     options.add_argument('-h', '--help', action='help', help='Displays CLI usage statement')
     args, unknown = parser.parse_known_args()
     # Validate the input file has ".i" extension
-    utils.validateExtension(".i", args.inputFile[0])
+    if args.inputFile:
+        utils.validateExtension(".i", args.inputFile[0])
     return args
 
 
@@ -42,7 +43,7 @@ def getInputFilePath(args):
         inputFile = args.inputFile[0]
     else:
         from . import settings
-        inputFile = os.getenv("INPUT_FILE_NAME")
+        inputFile = os.getenv("CONFIG_INPUT_FILE_NAME")
         isEnvVariable = True
     return inputFile, isEnvVariable
 
@@ -167,7 +168,7 @@ def main():
     inputFile, isEnvVariable = getInputFilePath(args)
     utils.validatePathsExist(inputFile)
     if isEnvVariable:
-        logging.info('Template Parser started. Using input file %s', os.getenv('INPUT_FILE_NAME'))
+        logging.info('Template Parser started. Using input file %s', os.getenv('CONFIG_INPUT_FILE_NAME'))
         configFile = getConfigFileName()
     else:
         configFile = getConfigFileName(inputFile)
@@ -177,7 +178,7 @@ def main():
         if isEnvVariable:
             logging.info(
                 'Success: The Template Parser used the MOOSE input file %s to generate a configuration file %s',
-                os.getenv('INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
+                os.getenv('CONFIG_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
         else:
             print('Success: The provided MOOSE input file %s generated a configuration file %s' %
                   (inputFile, configFile))

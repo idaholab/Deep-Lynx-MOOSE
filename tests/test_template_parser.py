@@ -49,7 +49,7 @@ def test_getInputFileName_env():
     args = template_parser.getParserArguments()
     inputFile, isEnvVariable = template_parser.getInputFileName(args)
     assert isEnvVariable == True
-    assert inputFile == os.getenv("INPUT_FILE_NAME")
+    assert inputFile == os.getenv("CONFIG_INPUT_FILE_NAME")
 
 
 def test_getInputFileName_console():
@@ -244,7 +244,7 @@ def test_main_env_success():
     sys.argv = [parser_path]
     inputFilePath = os.path.join('tests', 'test_input_files', 'test01.i')
     configFilePath = os.path.join('tests', 'test_input_files', 'test01.cfg')
-    os.environ['INPUT_FILE_NAME'] = inputFilePath
+    os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
     os.environ['CONFIG_FILE_NAME'] = configFilePath
     didSucceed = template_parser.main()
     assert didSucceed == True
@@ -259,7 +259,7 @@ def test_main_env_fail():
     sys.argv = [parser_path]
     inputFilePath = os.path.join('tests', 'test01.i')
     configFilePath = os.path.join('tests', 'test01.cfg')
-    os.environ['INPUT_FILE_NAME'] = inputFilePath
+    os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
     didSucceed = template_parser.main()
     assert didSucceed == False
     assert os.path.isfile(configFilePath) == False
