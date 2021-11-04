@@ -3,4 +3,5 @@
 *
 # Except this file
 !.gitignore
-!input_file.i
+!/example
+!/example/*

@@ -25,7 +25,7 @@ def deep_lynx_import(dl_service: deep_lynx.DeepLynxService):
         payload_list.extend(payload[key])
     # Manually import the data
     info = create_manual_import(dl_service, payload_list)
-    if info['isError'] == False:
+    if info and info['isError'] == False:
         logging.info("Successfully imported data to deep lynx")
         print("Successfully imported data to deep lynx")
     else:
@@ -33,15 +33,15 @@ def deep_lynx_import(dl_service: deep_lynx.DeepLynxService):
         print("Could not import data into Deep Lynx. Check log file for more information")
 
 
-def create_manual_import(dl_service: deep_lynx.DeepLynxService, payload: list):
+def create_manual_import(dl_service: deep_lynx.DeepLynxService = None, payload: list = None):
     """
     Creates a manual import of the payload to insert into Deep Lynx
     Args
         dl_service (DeepLynxService): deep lynx service object
         payload (list): a list of payloads to import into deep lynx
     """
-
-    return dl_service.create_manual_import(dl_service.container_id, dl_service.data_source_id, payload)
+    if dl_service and payload:
+        return dl_service.create_manual_import(dl_service.container_id, dl_service.data_source_id, payload)
 
 
 def upload_file(dl_service: deep_lynx.DeepLynxService, file_paths: list):

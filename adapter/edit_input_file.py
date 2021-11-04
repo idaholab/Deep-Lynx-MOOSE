@@ -7,6 +7,7 @@ import datetime
 import time
 import deep_lynx
 import utils
+import settings
 from adapter import template_parser
 
 import pyhit

@@ -8,7 +8,7 @@ from flask import Flask, request, Response, json
 
 import deep_lynx
 from . import moose_adapter
-from . import settings
+import settings
 
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
 logging.basicConfig(filename='MOOSEAdapter.log',

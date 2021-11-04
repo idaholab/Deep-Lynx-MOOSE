@@ -42,7 +42,7 @@ def getInputFilePath(args):
     if args.inputFile is not None:
         inputFile = args.inputFile[0]
     else:
-        from . import settings
+        import settings
         inputFile = os.getenv("CONFIG_INPUT_FILE_NAME")
         isEnvVariable = True
     return inputFile, isEnvVariable

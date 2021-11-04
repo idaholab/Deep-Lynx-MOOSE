@@ -10,6 +10,7 @@ import deep_lynx
 import utils
 from adapter.deep_lynx_query import deep_lynx_query
 from adapter.deep_lynx_import import deep_lynx_import
+import settings
 
 import pyhit
 import moosetree
