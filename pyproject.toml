@@ -19,13 +19,14 @@ flask = "*"
 requests = "*"
 python-dotenv = "*"
 deep-lynx = "*"
-configparser = "^5.0.2"
+configparser = "*"
+pandas = "*"
 
 [tool.poetry.dev-dependencies]
-pytest-mock = "^3.6.1"
-pytest = "^6.2.4"
-coverage = "^5.5"
-pytest-cov = "^2.12.1"
+pytest-mock = "*"
+pytest = "*"
+coverage = "*"
+pytest-cov = "*"
 
 [build-system]
 requires = ["poetry>=0.12"]

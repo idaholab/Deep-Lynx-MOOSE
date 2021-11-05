@@ -4,6 +4,7 @@ import pytest
 import sys
 import os
 import logging
+import deep_lynx
 
 import pyhit
 import moosetree
@@ -26,19 +27,6 @@ class TestMOOSEAdapter:
     logger = logging.getLogger('moose-adapter')
 
     # Deep Lynx environment variables
-    DEEP_LYNX_URL = None
-    CONTAINER_NAME = None
-    DATA_SOURCE_NAME = None
-    PYTHONPATH = None
-    MOOSE_OPT_PATH = None
-    QUERY_FILE_NAME = None
-    CONFIG_INPUT_FILE_NAME = None
-    CONFIG_FILE_NAME = None
-    RUN_FILE_NAME = None
-    IMPORT_FILE_NAME = None
-    IMPORT_FILE_WAIT_SECONDS = None
-    REGISTER_WAIT_SECONDS = None
-
     def set_env_success(self):
         """
         Setup for env variables
@@ -52,7 +40,7 @@ class TestMOOSEAdapter:
         QUERY_FILE_NAME = os.path.join('data', 'example', 'query_file.csv')
         CONFIG_INPUT_FILE_NAME = os.path.join('tests', 'test_files', 'test01.i')
         CONFIG_FILE_NAME = os.path.join('tests', 'test_files', 'test01.cfg')
-        RUN_FILE_NAME = os.path.join('tests', 'test_files', 'test01_run.cfg')
+        RUN_FILE_NAME = os.path.join('tests', 'test_files', 'test01_run.i')
         IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')
         QUERY_FILE_WAIT_SECONDS = 5
         IMPORT_FILE_WAIT_SECONDS = 5
@@ -98,6 +86,10 @@ class TestMOOSEAdapter:
             resp = cls.dl_service.delete_container(cls.dl_service.container_id)
         if cls.container_id:
             resp = cls.dl_service.delete_container(cls.container_id)
+        if os.path.exists(os.path.join('tests', 'test_files', 'test01.cfg')):
+            os.remove(os.path.join('tests', 'test_files', 'test01.cfg'))
+        if os.path.exists(os.path.join('tests', 'test_files', 'test01_run.i')):
+            os.remove(os.path.join('tests', 'test_files', 'test01_run.i'))
 
     inputFilePath = os.path.join('tests', 'test_input_files', 'test01.i')
     configFilePath = os.path.join('tests', 'test_input_files', 'test01.cfg')

@@ -1,3 +1,4 @@
+# Copyright 2021, Battelle Energy Alliance, LLC
 xmax = 4 # {{change}} Changed 'xmax' from 3 to 4
 
 [Mesh]
@@ -87,6 +88,6 @@ xmax = 4 # {{change}} Changed 'xmax' from 3 to 4
     type = JSON
     postprocessors_as_reporters = true
     vectorpostprocessors_as_reporters = true
-    file_base = output/sockeye_run_out
+    file_base = output/output_file
   []
 []

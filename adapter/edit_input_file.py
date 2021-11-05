@@ -178,12 +178,13 @@ def main(jsonData=None, event=None, dlService=None):
     """
 
     if jsonData is None:
-        jsonData = createJSONData()
+        #jsonData = createJSONData()
+        jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
     if not os.path.exists(os.getenv("CONFIG_FILE_NAME")):
         template_parser.main()
     isValidated = validateChangesToInputFile(jsonData)
-    if isValidated:
-        modifyInputFile(jsonData)
+    #if isValidated:
+        #modifyInputFile(jsonData)
 
 
 if __name__ == '__main__':
