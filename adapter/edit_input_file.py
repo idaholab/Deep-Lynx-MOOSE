@@ -184,7 +184,7 @@ def main(jsonData=None, event=None, dlService=None):
         template_parser.main()
     isValidated = validateChangesToInputFile(jsonData)
     #if isValidated:
-        #modifyInputFile(jsonData)
+    #modifyInputFile(jsonData)
 
 
 if __name__ == '__main__':

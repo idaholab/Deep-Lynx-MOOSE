@@ -13,6 +13,7 @@ from adapter import edit_input_file
 from adapter import template_parser
 from adapter import settings
 
+
 class TestEditInputFile:
 
     dl_service = None
@@ -20,11 +21,11 @@ class TestEditInputFile:
     # Setup logging
     # Remove log file if it exists
     #if os.path.exists(log_path):
-        #os.remove(log_path)
+    #os.remove(log_path)
 
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', filename=log_path, level=logging.INFO)
     logger = logging.getLogger('moose-adapter')
-    
+
     # Environment Variables
     DEEP_LYNX_URL = os.getenv("DEEP_LYNX_URL")
     CONTAINER_NAME = os.getenv("CONTAINER_NAME")
@@ -39,7 +40,6 @@ class TestEditInputFile:
     QUERY_FILE_WAIT_SECONDS = 5
     IMPORT_FILE_WAIT_SECONDS = 5
     REGISTER_WAIT_SECONDS = 5
-
 
     def test_valid_json_data(self):
         """
@@ -59,7 +59,6 @@ class TestEditInputFile:
             notExist = jsonData[i].get('city', 'not exist')
             assert notExist == 'not exist'
 
-
     def test_invalid_node(self):
         """
         Assert that an incorrect json object is provided 
@@ -68,7 +67,6 @@ class TestEditInputFile:
         jsonData = [{"node": "/B", "parameter": "year", "value": 2000}]
         isValidated = edit_input_file.validateChangesToInputFile(jsonData)
         assert isValidated == False
-
 
     def test_invalid_parameter(self):
         """
@@ -79,7 +77,6 @@ class TestEditInputFile:
         isValidated = edit_input_file.validateChangesToInputFile(jsonData)
         assert isValidated == False
 
-
     def test_invalid_value(self):
         """
         Assert that an incorrect json object is provided 
@@ -89,7 +86,6 @@ class TestEditInputFile:
         isValidated = edit_input_file.validateChangesToInputFile(jsonData)
         assert isValidated == False
 
-
     def test_valid_node_parameter_value(self):
         """
         Assert that a correct json object is provided 
@@ -98,7 +94,6 @@ class TestEditInputFile:
         jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
         isValidated = edit_input_file.validateChangesToInputFile(jsonData)
         assert isValidated == True
-
 
     def test_valid_update_parameter_value(self):
         """
@@ -115,7 +110,6 @@ class TestEditInputFile:
             assert node['year'] == 2000
             comment = node.comment(param='year')
             assert comment.find('{{change}}') != -1
-
 
     def test_valid_remove_config_comments(self):
         """
@@ -134,7 +128,6 @@ class TestEditInputFile:
             assert yearComment.find('{{config}}') == -1
             monthComment = node.comment(param='month')
             assert monthComment.find('{{config}}') == -1
-
 
     def test_valid_modify_input_file(self):
         """

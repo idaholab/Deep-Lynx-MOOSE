@@ -97,7 +97,6 @@ class TestMOOSEAdapter:
     moose_executable = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
     moose_python = os.path.join('~', 'projects', 'moose', 'python')
 
-
     def createConfigFile_scenario01():
         sys.argv = [os.path.join('adapter', 'template_parser.py')]
         os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
@@ -105,13 +104,11 @@ class TestMOOSEAdapter:
         os.environ['RUN_FILE_NAME'] = runFilePath
         didSucceed = template_parser.main()
 
-
     def deleteConfigFile():
         if os.path.isfile(configFilePath):
             os.remove(configFilePath)
         if os.path.isfile(runFilePath):
             os.remove(runFilePath)
-
 
     def createConfigFile_scenario02_success():
         os.environ['CONFIG_INPUT_FILE_NAME'] = "data/input_file.i"
@@ -120,7 +117,6 @@ class TestMOOSEAdapter:
         os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
         didSucceed = template_parser.main()
 
-
     def createConfigFile_scenario02_fail():
         sys.argv = [os.path.join('adapter', 'template_parser.py')]
         os.environ['CONFIG_INPUT_FILE_NAME'] = inputFilePath
@@ -128,7 +124,6 @@ class TestMOOSEAdapter:
         os.environ['RUN_FILE_NAME'] = runFilePath
         os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'moose_test-opt')
         didSucceed = template_parser.main()
-
 
     def createConfigFile_scenario03():
         sys.argv = [os.path.join('adapter', 'template_parser.py')]
@@ -144,9 +139,6 @@ class TestMOOSEAdapter:
         os.environ['DATA_SOURCE_NAME'] = 'MOOSEAdapter'
         didSucceed = template_parser.main()
 
-
-
-
     def test_validatePathsExist_valid():
         """Validate that MOOSE_OPT_PATH and RUN_FILE_NAME paths exist
             Test Case: Valid MOOSE_OPT_PATH and RUN_FILE_NAME paths"""
@@ -158,7 +150,6 @@ class TestMOOSEAdapter:
         isValidated = moose_adapter.validatePathsExist()
         assert isValidated == True
         deleteConfigFile()
-
 
     def test_validatePathsExist_invalidMooseOptPath():
         """Validate that MOOSE_OPT_PATH path does not exist
@@ -172,7 +163,6 @@ class TestMOOSEAdapter:
         assert isValidated == False
         deleteConfigFile()
 
-
     def test_validatePathsExist_invalidRunFileName():
         """Validate that RUN_FILE_NAME path does not exist
             Test Case: Invalid RUN_FILE_NAME path"""
@@ -185,7 +175,6 @@ class TestMOOSEAdapter:
         assert isValidated == False
         deleteConfigFile()
 
-
     def test_runInputFile_success():
         """Validate that the input file is run in MOOSE
             Test Case: Successful run in MOOSE"""
@@ -194,7 +183,6 @@ class TestMOOSEAdapter:
         moose_adapter.createInputFileToRun(jsonData)
         isRun = moose_adapter.runInputFile()
         assert isRun == True
-
 
     def test_runInputFile_fail():
         """Validate that the input file is run in MOOSE
@@ -205,7 +193,6 @@ class TestMOOSEAdapter:
         isRun = moose_adapter.runInputFile()
         assert isRun == False
         deleteConfigFile()
-
 
     def test_getOutputFile_notExist():
         """Validate output file does not exist
@@ -218,4 +205,3 @@ class TestMOOSEAdapter:
         isOutputFile = moose_adapter.getOutputFile()
         assert isOutputFile == False
         deleteConfigFile()
-
