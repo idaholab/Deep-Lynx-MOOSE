@@ -50,7 +50,6 @@ class TestEditInputFile:
         args = template_parser.getParserArguments()
         assert args.inputFile[0] == 'inputFile.i'
 
-
     def test_no_parsing_arguments(self):
         """
         Assert that no arguments passed in via the command line is parsed accordingly
@@ -59,7 +58,6 @@ class TestEditInputFile:
         sys.argv = [self.PARSER_PATH]
         args = template_parser.getParserArguments()
         assert args.inputFile == None
-
 
     def test_valid_env_input_file_path(self):
         """
@@ -72,7 +70,6 @@ class TestEditInputFile:
         assert isEnvVariable == True
         assert inputFile == os.getenv("CONFIG_INPUT_FILE_NAME")
 
-
     def test_valid_console_input_file_path(self):
         """
         Assert that the input file is provided by the command line
@@ -84,7 +81,6 @@ class TestEditInputFile:
         assert isEnvVariable == False
         assert inputFile == 'inputFile.i'
 
-
     def test_valid_env_config_file_name(self):
         """
         Assert that the file extension is changed to .cfg
@@ -92,14 +88,12 @@ class TestEditInputFile:
         """
         assert template_parser.getConfigFileName() == os.getenv('CONFIG_FILE_NAME')
 
-
     def test_valid_console_config_file_name(self):
         """
         Assert that the file extension is changed to .cfg
         Test Case (getConfigFileName): Check that a provided file is changed to have a file extension .cfg for the console
         """
         assert template_parser.getConfigFileName('inputFile.txt') == 'inputFile.cfg'
-
 
     def test_valid_local_parameters_of_node(self):
         """
@@ -118,7 +112,6 @@ class TestEditInputFile:
         expectedParamsDict['day'] = 'int'
         assert section == '/A'
         assert paramsDict == expectedParamsDict
-
 
     def test_valid_global_parameters_of_node_01(self):
         """
@@ -141,7 +134,6 @@ class TestEditInputFile:
         assert section == '/A'
         assert paramsDict == expectedParamsDict
 
-
     def test_valid_global_parameters_of_node_02(self):
         """
         Assert that the expected section and dictionary of parameters {parameter name: datatype of parameter value} are returned
@@ -161,7 +153,6 @@ class TestEditInputFile:
         assert section == None
         assert paramsDict == None
 
-
     def test_valid_global_parameters_of_node_03(self):
         """
         Assert that the expected section and dictionary of parameters {parameter name: datatype of parameter value} are returned
@@ -177,7 +168,6 @@ class TestEditInputFile:
         assert section == '/A'
         assert paramsDict == expectedParamsDict
 
-
     def test_valid_local_config_parameters(self):
         """
         Assert that the expected configuration dictionary { section: {parameter name: datatype of parameter value}} is returned
@@ -187,7 +177,6 @@ class TestEditInputFile:
         expectedConfigParams = dict()
         expectedConfigParams['/A'] = {'year': 'int', 'month': 'str', 'day': 'int'}
         assert configParams == expectedConfigParams
-
 
     def test_valid_global_config_parameters_01(self):
         """
@@ -201,7 +190,6 @@ class TestEditInputFile:
         expectedConfigParams['/A'] = {'month': 'int'}
         assert configParams == expectedConfigParams
 
-
     def test_valid_global_config_parameters_02(self):
         """
         Assert that the expected configuration dictionary { section: {parameter name: datatype of parameter value}} is returned
@@ -213,7 +201,6 @@ class TestEditInputFile:
         expectedConfigParams['root'] = {'month': 'int'}
         assert configParams == expectedConfigParams
 
-
     def test_valid_global_config_parameters_03(self):
         """
         Assert that the expected configuration dictionary { section: {parameter name: datatype of parameter value}} is returned
@@ -223,7 +210,6 @@ class TestEditInputFile:
         expectedConfigParams = dict()
         expectedConfigParams['/A'] = {'month': 'int'}
         assert configParams == expectedConfigParams
-
 
     def test_valid_write_config_file(self):
         """
