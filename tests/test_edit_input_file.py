@@ -20,8 +20,8 @@ class TestEditInputFile:
     log_path = 'test.log'
     # Setup logging
     # Remove log file if it exists
-    #if os.path.exists(log_path):
-    #os.remove(log_path)
+    if os.path.exists(log_path):
+        os.remove(log_path)
 
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', filename=log_path, level=logging.INFO)
     logger = logging.getLogger('moose-adapter')
@@ -137,3 +137,5 @@ class TestEditInputFile:
         jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
         edit_input_file.modifyInputFile(jsonData)
         assert os.path.isfile(self.RUN_FILE_NAME) == True
+        if os.path.isfile(self.RUN_FILE_NAME):
+            os.remove(self.RUN_FILE_NAME)
