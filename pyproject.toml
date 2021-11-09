@@ -21,6 +21,7 @@ python-dotenv = "*"
 deep-lynx = "*"
 configparser = "*"
 pandas = "*"
+environs = "*"
 
 [tool.poetry.dev-dependencies]
 pytest-mock = "*"

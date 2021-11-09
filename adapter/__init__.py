@@ -5,9 +5,11 @@ import json
 import time
 import datetime
 from flask import Flask, request, Response, json
-
+import environs
 import deep_lynx
+
 from . import moose_adapter
+import utils
 import settings
 
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
@@ -19,53 +21,36 @@ logging.basicConfig(filename='MOOSEAdapter.log',
 
 print('Application started. Logging to file MOOSEAdapter.log')
 
-data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))["Data Sources"]
-
 
 def create_app():
     """ This file and aplication is the entry point for the `flask run` command """
     app = Flask(os.getenv('FLASK_APP'), instance_relative_config=True)
 
-    existEnvFile = False
-    inputFileName = False
-    configFileName = False
-    runFileName = False
-    outputFileName = False
-    pythonPath = False
-    mooseOptPath = False
-    deepLynxUrl = False
-    containerName = False
-    dataSourceName = False
+    # Validate .env file exists
+    utils.validatePathsExist(".env")
 
-    if os.path.isfile('.env'):
-        existEnvFile = True
-    else:
-        logging.error('Fail: Create .env file using .env_sample as a guide.')
+    # Check required variables in the .env file, and raise error if not set
+    env = environs.Env()
+    env.read_env()
+    env.url("DEEP_LYNX_URL")
+    env.str("CONTAINER_NAME")
+    env.str("DATA_SOURCE_NAME")
+    env.json("DATA_SOURCES")
+    env.path("PYTHONPATH")
+    env.path("MOOSE_OPT_PATH")
+    env.path("QUERY_FILE_NAME")
+    env.path("CONFIG_INPUT_FILE_NAME")
+    env.path("CONFIG_FILE_NAME")
+    env.path("RUN_FILE_NAME")
+    env.path("IMPORT_FILE_NAME")
+    env.int("QUERY_FILE_WAIT_SECONDS")
+    env.int("IMPORT_FILE_WAIT_SECONDS")
+    env.int("REGISTER_WAIT_SECONDS")
 
-    if os.getenv('DEEP_LYNX_URL') is not None:
-        deepLynxUrl = True
-    else:
-        logging.error('Fail: Provide an "DEEP_LYNX_URL" variable in the .env file')
-
-    if os.getenv('CONTAINER_NAME') is not None:
-        containerName = True
-    else:
-        logging.error('Fail: Provide an "CONTAINER_NAME" variable in the .env file')
-
-    if os.getenv('DATA_SOURCE_NAME') is not None:
-        dataSourceName = True
-    else:
-        logging.error('Fail: Provide an "DATA_SOURCE_NAME" variable in the .env file')
-
-    if existEnvFile and deepLynxUrl and containerName and dataSourceName:
-        # instantiate deep_lynx_service
-        dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
-                                              os.getenv('DATA_SOURCE_NAME'))
-        dlService.init()
-    else:
-        print('Setup Error: Check logging file MOOSEAdapter.log for more information')
-
-    # config available via os.getenv('VAR_NAME')
+    # Instantiate deep_lynx_service
+    dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
+                                          os.getenv('DATA_SOURCE_NAME'))
+    dlService.init()
 
     @app.route('/events', methods=['POST'])
     def events():
@@ -118,15 +103,14 @@ def create_app():
 
     # disable running the code twice upon start in development
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        if existEnvFile and inputFileName and configFileName and runFileName and outputFileName and pythonPath and mooseOptPath and deepLynxUrl and containerName and dataSourceName:
-            from . import template_parser
-            createConfigFile = template_parser.main()
-            if not createConfigFile:
-                logging.error('Unable to create config file')
+        """from . import template_parser
+        createConfigFile = template_parser.main()
+        if not createConfigFile:
+            logging.error('Unable to create config file')"""
 
-            # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
-            moose_adapter.main()
-            # register_for_event(dlService)
+        # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
+        #moose_adapter.main()
+        # register_for_event(dlService)
 
     return app
 
