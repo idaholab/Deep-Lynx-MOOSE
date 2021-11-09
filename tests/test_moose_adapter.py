@@ -60,7 +60,6 @@ class TestMOOSEAdapter:
         isFound = moose_adapter.queryDeepLynx()
         assert isFound == False
 
-
     def test_valid_run_input_file(self):
         """
         Validate that the input file is successfully run in MOOSE
@@ -99,5 +98,3 @@ class TestMOOSEAdapter:
         os.environ['IMPORT_FILE_WAIT_SECONDS'] = "1"
         isFound = moose_adapter.importToDeepLynx()
         assert isFound == False
-
-        
