@@ -9,28 +9,29 @@ import deep_lynx
 import utils
 
 
-def deep_lynx_import(dl_service: deep_lynx.DeepLynxService):
+def deep_lynx_import(dl_service: deep_lynx.DeepLynxService = None):
     """
     Imports data into Deep Lynx
     Args
         dl_service (DeepLynxService): deep lynx service object
     """
-    # Location of file to read
-    data_file = os.getenv("IMPORT_FILE_NAME")
-    # Generate a dictionary of payloads to import
-    payload = generate_payload(data_file)
-    # Convert dictionary to list of payloads
-    payload_list = list()
-    for key in payload.keys():
-        payload_list.extend(payload[key])
-    # Manually import the data
-    info = create_manual_import(dl_service, payload_list)
-    if info and info['isError'] == False:
-        logging.info("Successfully imported data to deep lynx")
-        print("Successfully imported data to deep lynx")
-    else:
-        logging.error(info)
-        print("Could not import data into Deep Lynx. Check log file for more information")
+    if dl_service:
+        # Location of file to read
+        data_file = os.getenv("IMPORT_FILE_NAME")
+        # Generate a dictionary of payloads to import
+        payload = generate_payload(data_file)
+        # Convert dictionary to list of payloads
+        payload_list = list()
+        for key in payload.keys():
+            payload_list.extend(payload[key])
+        # Manually import the data
+        info = create_manual_import(dl_service, payload_list)
+        if info and info['isError'] == False:
+            logging.info("Successfully imported data to deep lynx")
+            print("Successfully imported data to deep lynx")
+        else:
+            logging.error(info)
+            print("Could not import data into Deep Lynx. Check log file for more information")
 
 
 def create_manual_import(dl_service: deep_lynx.DeepLynxService = None, payload: list = None):

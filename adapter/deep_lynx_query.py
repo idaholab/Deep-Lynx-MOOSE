@@ -7,18 +7,19 @@ import pandas as pd
 import deep_lynx
 
 
-def deep_lynx_query(dl_service: deep_lynx.DeepLynxService):
+def deep_lynx_query(dl_service: deep_lynx.DeepLynxService = None):
     """
     Queries deep lynx for data and writes the dataset to .csv file
     Args
         dl_service (DeepLynxService): deep lynx service object
     """
-    # Location of the file to write
-    data_file = os.getenv("QUERY_FILE_NAME")
-    # Compile data by querying Deep Lynx
-    dataset = compile_data(dl_service)
-    # Write dataset to csv file
-    write_csv(dataset, data_file)
+    if dl_service:
+        # Location of the file to write
+        data_file = os.getenv("QUERY_FILE_NAME")
+        # Compile data by querying Deep Lynx
+        dataset = compile_data(dl_service)
+        # Write dataset to csv file
+        write_csv(dataset, data_file)
 
 
 def query(dl_service: deep_lynx.DeepLynxService, payload: str):

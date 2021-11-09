@@ -17,7 +17,7 @@ import moosetree
 import mooseutils
 
 
-def queryDeepLynx(dlService: deep_lynx.DeepLynxService):
+def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None):
     """
     Query Deep Lynx for data
     Args
@@ -53,7 +53,7 @@ def queryDeepLynx(dlService: deep_lynx.DeepLynxService):
                 logging.info(
                     f'Fail: {os.getenv("QUERY_FILE_NAME")} was not found. Trying again in {os.getenv("QUERY_FILE_WAIT_SECONDS")} seconds'
                 )
-                time.sleep(os.getenv("QUERY_FILE_WAIT_SECONDS"))
+                time.sleep(int(os.getenv("QUERY_FILE_WAIT_SECONDS")))
     if didSucceed:
         return True
     return False
@@ -86,7 +86,7 @@ def createOutputFile():
     results.to_csv(os.getenv("IMPORT_FILE_NAME"), index=False)
 
 
-def importToDeepLynx(dlService: deep_lynx.DeepLynxService, event: dict = None):
+def importToDeepLynx(dlService: deep_lynx.DeepLynxService = None, event: dict = None):
     """
     Imports the results into Deep Lynx
     Args
@@ -105,7 +105,7 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService, event: dict = None):
             deep_lynx_import(dlService)
             logging.info('Success: Run complete. Output data sent.')
 
-            if event is not None:
+            if event:
                 # Send event signaling MOOSE is done
                 event['status'] = 'complete'
                 event['modifiedDate'] = datetime.datetime.now().isoformat()
@@ -129,7 +129,7 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService, event: dict = None):
                 logging.info(
                     f'Fail: {os.getenv("IMPORT_FILE_NAME")} was not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
                 )
-                time.sleep(os.getenv("IMPORT_FILE_WAIT_SECONDS"))
+                time.sleep(int(os.getenv("IMPORT_FILE_WAIT_SECONDS")))
     if didSucceed:
         return True
     return False
