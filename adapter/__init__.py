@@ -35,7 +35,7 @@ def create_app():
     env.url("DEEP_LYNX_URL")
     env.str("CONTAINER_NAME")
     env.str("DATA_SOURCE_NAME")
-    env.json("DATA_SOURCES")
+    env.list("DATA_SOURCES")
     env.path("PYTHONPATH")
     env.path("MOOSE_OPT_PATH")
     env.path("QUERY_FILE_NAME")
@@ -54,6 +54,9 @@ def create_app():
 
     @app.route('/events', methods=['POST'])
     def events():
+        import pdb; pdb.set_trace()
+        print(request)
+
         if request.method == 'POST':
             if 'application/json' not in request.content_type:
                 return Response('Unsupported Content Type. Please use application/json', status=400)
@@ -61,12 +64,12 @@ def create_app():
 
             logging.info('Received event with data: ' + json.dumps(data))
             import_data = dlService.list_import_data(dlService.container_id, data['import_id'])
-
+            print(import_data)
             # parse event data and run dt_driver main
             # check for event object type
             try:
                 dl_event = import_data['value'][0]['data']
-
+                print(dl_event) 
                 if 'instruction' in dl_event:
                     if dl_event['instruction'] == 'run':
                         logging.info('New run event')
@@ -93,7 +96,7 @@ def create_app():
                         dl_event['modifiedUser'] = os.getenv('DATA_SOURCE_NAME')
                         dlService.create_manual_import(dlService.container_id, dlService.data_source_id, dl_event)
 
-                        moose_adapter.main(moose_data, dl_event, dlService)
+                        #moose_adapter.main(moose_data, dl_event, dlService)
 
                         return Response(response=json.dumps(dl_event), status=200, mimetype='application/json')
 
@@ -110,7 +113,7 @@ def create_app():
 
         # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
         #moose_adapter.main()
-        # register_for_event(dlService)
+        #nregister_for_event(dlService)
 
     return app
 
@@ -120,8 +123,9 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
     registered = False
 
     # List of adapters to receive events from
-    data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))["Data Sources"]
+    data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))
 
+    # Register events for listening from other data sources 
     while not registered and iterations > 0:
         # Get a list of data sources and validate that no error occurred
         data_sources = dlService.list_data_sources(dlService.container_id)
@@ -140,8 +144,8 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
                         container_id,
                         "data_source_id":
                         data_source_id,
-                        "type":
-                        "data_ingested"
+                        "event_type":
+                        "data_imported"
                     })
 
                     # Verify the event was registered
