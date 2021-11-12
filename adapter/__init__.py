@@ -54,7 +54,8 @@ def create_app():
 
     @app.route('/events', methods=['POST'])
     def events():
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         print(request)
 
         if request.method == 'POST':
@@ -69,7 +70,7 @@ def create_app():
             # check for event object type
             try:
                 dl_event = import_data['value'][0]['data']
-                print(dl_event) 
+                print(dl_event)
                 if 'instruction' in dl_event:
                     if dl_event['instruction'] == 'run':
                         logging.info('New run event')
@@ -125,7 +126,7 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
     # List of adapters to receive events from
     data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))
 
-    # Register events for listening from other data sources 
+    # Register events for listening from other data sources
     while not registered and iterations > 0:
         # Get a list of data sources and validate that no error occurred
         data_sources = dlService.list_data_sources(dlService.container_id)
