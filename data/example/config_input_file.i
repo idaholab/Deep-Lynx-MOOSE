@@ -1,4 +1,5 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
+
 xmax = 3 # {{config}}
 
 [Mesh]
@@ -88,6 +89,6 @@ xmax = 3 # {{config}}
     type = JSON
     postprocessors_as_reporters = true
     vectorpostprocessors_as_reporters = true
-    file_base = output/output_file
+    file_base = output/sockeye_run_out
   []
 []

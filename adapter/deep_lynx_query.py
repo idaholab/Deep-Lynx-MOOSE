@@ -7,15 +7,20 @@ import pandas as pd
 import deep_lynx
 
 
-def deep_lynx_query(dl_service: deep_lynx.DeepLynxService, data_file: str):
+def deep_lynx_query(dl_service: deep_lynx.DeepLynxService = None, dl_event: list = None):
     """
     Queries deep lynx for data and writes the dataset to .csv file
     Args
         dl_service (DeepLynxService): deep lynx service object
-        data_file (str): location of the file to write
+        dl_event (list): a list of json objects from a deep lynx event
     """
-    dataset = compile_data(dl_service)
-    write_csv(dataset, data_file)
+    if dl_service:
+        # Location of the file to write
+        data_file = os.getenv("QUERY_FILE_NAME")
+        # Compile data by querying Deep Lynx
+        dataset = compile_data(dl_service)
+        # Write dataset to csv file
+        write_csv(dataset, data_file)
 
 
 def query(dl_service: deep_lynx.DeepLynxService, payload: str):
@@ -52,11 +57,12 @@ def retrieve_file(dl_service: deep_lynx.DeepLynxService, file_id: str):
     return dl_service.retrieve_file(dl_service.container_id, file_id)
 
 
-def compile_data(dl_service: deep_lynx.DeepLynxService):
+def compile_data(dl_service: deep_lynx.DeepLynxService, dl_event: list = None):
     """
     Complies a dataset from deep lynx queries
     Args
         dl_service (DeepLynxService): deep lynx service object
+        dl_event (list): a list of json objects from a deep lynx event
     Return
         dataset (DataFrame or Series): a pandas DataFrame or Series of the data
     """

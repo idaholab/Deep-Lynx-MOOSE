@@ -5,10 +5,12 @@ import json
 import time
 import datetime
 from flask import Flask, request, Response, json
+import environs
+import deep_lynx
 
-from deep_lynx.deep_lynx_service import DeepLynxService
 from . import moose_adapter
-from . import settings
+import utils
+import settings
 
 # configure logging. to overwrite the log file for each run, add option: filemode='w'
 logging.basicConfig(filename='MOOSEAdapter.log',
@@ -19,86 +21,40 @@ logging.basicConfig(filename='MOOSEAdapter.log',
 
 print('Application started. Logging to file MOOSEAdapter.log')
 
-data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))["Data Sources"]
-
 
 def create_app():
     """ This file and aplication is the entry point for the `flask run` command """
     app = Flask(os.getenv('FLASK_APP'), instance_relative_config=True)
 
-    existEnvFile = False
-    inputFileName = False
-    configFileName = False
-    runFileName = False
-    outputFileName = False
-    pythonPath = False
-    mooseOptPath = False
-    deepLynxUrl = False
-    containerName = False
-    dataSourceName = False
+    # Validate .env file exists
+    utils.validatePathsExist(".env")
 
-    if os.path.isfile('.env'):
-        existEnvFile = True
-    else:
-        logging.error('Fail: Create .env file using .env_sample as a guide.')
+    # Check required variables in the .env file, and raise error if not set
+    env = environs.Env()
+    env.read_env()
+    env.url("DEEP_LYNX_URL")
+    env.str("CONTAINER_NAME")
+    env.str("DATA_SOURCE_NAME")
+    env.list("DATA_SOURCES")
+    env.path("PYTHONPATH")
+    env.path("MOOSE_OPT_PATH")
+    env.path("QUERY_FILE_NAME")
+    env.path("CONFIG_INPUT_FILE_NAME")
+    env.path("CONFIG_FILE_NAME")
+    env.path("RUN_FILE_NAME")
+    env.path("IMPORT_FILE_NAME")
+    env.int("QUERY_FILE_WAIT_SECONDS")
+    env.int("IMPORT_FILE_WAIT_SECONDS")
+    env.int("REGISTER_WAIT_SECONDS")
 
-    if os.getenv('INPUT_FILE_NAME') is not None:
-        inputFileName = True
-    else:
-        logging.error('Fail: Provide an "INPUT_FILE_NAME" variable in the .env file')
-
-    if os.getenv('CONFIG_FILE_NAME') is not None:
-        configFileName = True
-    else:
-        logging.error('Fail: Provide an "CONFIG_FILE_NAME" variable in the .env file')
-
-    if os.getenv('RUN_FILE_NAME') is not None:
-        runFileName = True
-    else:
-        logging.error('Fail: Provide an "RUN_FILE_NAME" variable in the .env file')
-
-    if os.getenv('OUTPUT_FILE_NAME') is not None:
-        outputFileName = True
-    else:
-        logging.error('Fail: Provide an "OUTPUT_FILE_NAME" variable in the .env file')
-
-    if os.getenv('PYTHONPATH') is not None:
-        pythonPath = True
-    else:
-        logging.error('Fail: Provide an "PYTHONPATH" variable in the .env file')
-
-    if os.getenv('MOOSE_OPT_PATH') is not None:
-        mooseOptPath = True
-    else:
-        logging.error('Fail: Provide an "MOOSE_OPT_PATH" variable in the .env file')
-
-    if os.getenv('DEEP_LYNX_URL') is not None:
-        deepLynxUrl = True
-    else:
-        logging.error('Fail: Provide an "DEEP_LYNX_URL" variable in the .env file')
-
-    if os.getenv('CONTAINER_NAME') is not None:
-        containerName = True
-    else:
-        logging.error('Fail: Provide an "CONTAINER_NAME" variable in the .env file')
-
-    if os.getenv('DATA_SOURCE_NAME') is not None:
-        dataSourceName = True
-    else:
-        logging.error('Fail: Provide an "DATA_SOURCE_NAME" variable in the .env file')
-
-    if existEnvFile and inputFileName and configFileName and runFileName and outputFileName and pythonPath and mooseOptPath and deepLynxUrl and containerName and dataSourceName:
-        # instantiate deep_lynx_service
-        dlService = DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
-                                    os.getenv('DATA_SOURCE_NAME'))
-        dlService.init()
-    else:
-        print('Setup Error: Check logging file MOOSEAdapter.log for more information')
-
-    # config available via os.getenv('VAR_NAME')
+    # Instantiate deep_lynx_service
+    dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
+                                          os.getenv('DATA_SOURCE_NAME'))
+    dlService.init()
 
     @app.route('/events', methods=['POST'])
     def events():
+
         if request.method == 'POST':
             if 'application/json' not in request.content_type:
                 return Response('Unsupported Content Type. Please use application/json', status=400)
@@ -111,15 +67,13 @@ def create_app():
             # check for event object type
             try:
                 dl_event = import_data['value'][0]['data']
-
                 if 'instruction' in dl_event:
                     if dl_event['instruction'] == 'run':
                         logging.info('New run event')
                         print('New run event')
 
                         # if event object type with instruction 'run' is found,
-                        # grab original data id or import id and query DL for reactor map data
-                        event_data = dlService.list_import_data(dlService.container_id, dl_event['importID'])
+                        event_data = dlService.list_import_data(dlService.container_id, dl_event['import_id'])
 
                         if 'value' not in event_data:
                             return Response(response=json.dumps({'received': True}),
@@ -128,9 +82,6 @@ def create_app():
 
                         moose_data = event_data['value'][0]['data']
 
-                        # parse returned data and send to moose_adapter
-                        # TODO: ensure incoming objects are of the format {node, parameter, value}
-
                         # update event object and return to Deep Lynx
                         dl_event['status'] = 'in progress'
                         dl_event['received'] = True
@@ -138,7 +89,9 @@ def create_app():
                         dl_event['modifiedUser'] = os.getenv('DATA_SOURCE_NAME')
                         dlService.create_manual_import(dlService.container_id, dlService.data_source_id, dl_event)
 
-                        moose_adapter.main(moose_data, dl_event, dlService)
+                        # TODO 1. Compile all events into an array of json objects called dl_event_data
+                        # TODO 2. Call  moose_adapter.main() to run an input file in MOOSE
+                        #moose_adapter.main(dl_event_data, dlService)
 
                         return Response(response=json.dumps(dl_event), status=200, mimetype='application/json')
 
@@ -148,26 +101,21 @@ def create_app():
 
     # disable running the code twice upon start in development
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        if existEnvFile and inputFileName and configFileName and runFileName and outputFileName and pythonPath and mooseOptPath and deepLynxUrl and containerName and dataSourceName:
-            from . import template_parser
-            createConfigFile = template_parser.main()
-            if not createConfigFile:
-                logging.error('Unable to create config file')
-
-            # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
-            moose_adapter.main()
-            # register_for_event(dlService)
+        # TODO: Uncomment when wanted to register for listening for events from other data sources
+        #register_for_event(dlService)
+        print("")
 
     return app
 
 
-def register_for_event(dlService: DeepLynxService, iterations=30):
+def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
     """ Register with Deep Lynx to receive data_ingested events on applicable data sources """
     registered = False
 
     # List of adapters to receive events from
-    data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))["Data Sources"]
+    data_ingested_adapters = json.loads(os.getenv("DATA_SOURCES"))
 
+    # Register events for listening from other data sources
     while not registered and iterations > 0:
         # Get a list of data sources and validate that no error occurred
         data_sources = dlService.list_data_sources(dlService.container_id)
@@ -186,7 +134,7 @@ def register_for_event(dlService: DeepLynxService, iterations=30):
                         container_id,
                         "data_source_id":
                         data_source_id,
-                        "type":
+                        "event_type":
                         "data_ingested"
                     })
 
