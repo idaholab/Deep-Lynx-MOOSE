@@ -56,7 +56,7 @@ def retrieve_file(dl_service: deep_lynx.DeepLynxService, file_id: str):
     return dl_service.retrieve_file(dl_service.container_id, file_id)
 
 
-def compile_data(dl_service: deep_lynx.DeepLynxService):
+def compile_data(dl_service: deep_lynx.DeepLynxService, dl_event: list = None):
     """
     Complies a dataset from deep lynx queries
     Args

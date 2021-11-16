@@ -77,8 +77,7 @@ def create_app():
                         print('New run event')
 
                         # if event object type with instruction 'run' is found,
-                        # grab original data id or import id and query DL for reactor map data
-                        event_data = dlService.list_import_data(dlService.container_id, dl_event['importID'])
+                        event_data = dlService.list_import_data(dlService.container_id, dl_event['import_id'])
 
                         if 'value' not in event_data:
                             return Response(response=json.dumps({'received': True}),
@@ -87,8 +86,7 @@ def create_app():
 
                         moose_data = event_data['value'][0]['data']
 
-                        # parse returned data and send to moose_adapter
-                        # TODO: ensure incoming objects are of the format {node, parameter, value}
+                        # TODO: parse returned data and send to moose_adapter
 
                         # update event object and return to Deep Lynx
                         dl_event['status'] = 'in progress'
@@ -146,7 +144,7 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
                         "data_source_id":
                         data_source_id,
                         "event_type":
-                        "data_imported"
+                        "data_ingested"
                     })
 
                     # Verify the event was registered
