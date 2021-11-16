@@ -1,6 +1,6 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
+
 import os
-import sys
 import logging
 import argparse
 import configparser

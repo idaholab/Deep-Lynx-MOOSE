@@ -1,4 +1,5 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
+
 xmax = 4 # {{change}} Changed 'xmax' from 3 to 4
 
 [Mesh]

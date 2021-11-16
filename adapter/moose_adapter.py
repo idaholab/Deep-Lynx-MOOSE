@@ -1,7 +1,7 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
+
 import os
 import logging
-import json
 import datetime
 import time
 import pandas as pd
