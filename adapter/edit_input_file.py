@@ -180,8 +180,8 @@ def main(jsonData=None, event=None, dlService=None):
     if not os.path.exists(os.getenv("CONFIG_FILE_NAME")):
         template_parser.main()
     isValidated = validateChangesToInputFile(jsonData)
-    #if isValidated:
-    #modifyInputFile(jsonData)
+    if isValidated:
+        modifyInputFile(jsonData)
 
 
 if __name__ == '__main__':
