@@ -17,11 +17,12 @@ import moosetree
 import mooseutils
 
 
-def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None):
+def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None, dl_event: list = None):
     """
     Query Deep Lynx for data
     Args
         dl_service (DeepLynxService): deep lynx service object
+        dl_event (list): a list of json objects from a deep lynx event
     Return
         True: if query file is found
         False: query file is not found
@@ -29,7 +30,7 @@ def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None):
     done = False
     didSucceed = False
     start = time.time()
-    deep_lynx_query(dlService)
+    deep_lynx_query(dlService, dl_event)
     path = os.path.join(os.getcwd() + '/' + os.getenv('QUERY_FILE_NAME'))
     while not done:
         # Check if query file exists
@@ -135,14 +136,14 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService = None, event: dict = 
     return False
 
 
-def main(event=None, dlService=None):
+def main(dl_event=None, dlService=None):
     """
     Main entry point for script
     """
 
     logging.info('MOOSE Adapter started. Using input file %s and configuration file %s',
                  os.getenv('CONFIG_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
-    doesQueryFileExist = queryDeepLynx(dlService)
+    doesQueryFileExist = queryDeepLynx(dlService, dl_event)
     if doesQueryFileExist:
         isRun = runInputFile()
     if isRun:

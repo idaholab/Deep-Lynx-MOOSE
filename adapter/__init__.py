@@ -54,9 +54,6 @@ def create_app():
 
     @app.route('/events', methods=['POST'])
     def events():
-        import pdb
-        pdb.set_trace()
-        print(request)
 
         if request.method == 'POST':
             if 'application/json' not in request.content_type:
@@ -65,12 +62,11 @@ def create_app():
 
             logging.info('Received event with data: ' + json.dumps(data))
             import_data = dlService.list_import_data(dlService.container_id, data['import_id'])
-            print(import_data)
+
             # parse event data and run dt_driver main
             # check for event object type
             try:
                 dl_event = import_data['value'][0]['data']
-                print(dl_event)
                 if 'instruction' in dl_event:
                     if dl_event['instruction'] == 'run':
                         logging.info('New run event')
@@ -86,8 +82,6 @@ def create_app():
 
                         moose_data = event_data['value'][0]['data']
 
-                        # TODO: parse returned data and send to moose_adapter
-
                         # update event object and return to Deep Lynx
                         dl_event['status'] = 'in progress'
                         dl_event['received'] = True
@@ -95,7 +89,9 @@ def create_app():
                         dl_event['modifiedUser'] = os.getenv('DATA_SOURCE_NAME')
                         dlService.create_manual_import(dlService.container_id, dlService.data_source_id, dl_event)
 
-                        #moose_adapter.main(moose_data, dl_event, dlService)
+                        # TODO 1. Compile all events into an array of json objects called dl_event_data
+                        # TODO 2. Call  moose_adapter.main() to run an input file in MOOSE
+                        #moose_adapter.main(dl_event_data, dlService)
 
                         return Response(response=json.dumps(dl_event), status=200, mimetype='application/json')
 
@@ -105,14 +101,9 @@ def create_app():
 
     # disable running the code twice upon start in development
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        """from . import template_parser
-        createConfigFile = template_parser.main()
-        if not createConfigFile:
-            logging.error('Unable to create config file')"""
-
-        # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
-        #moose_adapter.main()
+        # TODO: Uncomment when wanted to register for listening for events from other data sources
         #register_for_event(dlService)
+        print("")
 
     return app
 
