@@ -112,7 +112,7 @@ def create_app():
 
         # TODO: Uncomment/comment when data source is available, the timer disables dev reloads
         #moose_adapter.main()
-        #nregister_for_event(dlService)
+        #register_for_event(dlService)
 
     return app
 
