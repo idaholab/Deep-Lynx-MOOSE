@@ -112,7 +112,7 @@ def importToDeepLynx(api_client: deep_lynx.ApiClient = None,
             logging.info(f'Found {os.getenv("IMPORT_FILE_NAME")}.')
             # Import data into Deep Lynx
             data_sources_api = deep_lynx.DataSourcesApi(api_client)
-            deep_lynx_import(data_sources_api, container_id, data_source_id)
+            deep_lynx_import(data_sources_api, api_client, container_id, data_source_id)
             logging.info('Success: Run complete. Output data sent.')
 
             if event:
