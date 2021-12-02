@@ -101,11 +101,12 @@ def deep_lynx_init():
     # authenticate via an API key and secret
     auth_api = deep_lynx.AuthenticationApi(api_client)
     token = auth_api.retrieve_o_auth_token(x_api_key=os.getenv('DEEP_LYNX_API_KEY'),
-        x_api_secret=os.getenv('DEEP_LYNX_API_SECRET'), x_api_expiry='12h')
+                                           x_api_secret=os.getenv('DEEP_LYNX_API_SECRET'),
+                                           x_api_expiry='12h')
 
     # update header
     api_client.set_default_header('Authorization', 'Bearer {}'.format(token))
-    
+
     # get container ID
     container_id = None
     container_api = deep_lynx.ContainersApi(api_client)
@@ -128,9 +129,9 @@ def deep_lynx_init():
         if datasource.name == os.getenv('DATA_SOURCE_NAME'):
             data_source_id = datasource.id
     if data_source_id is None:
-        datasource = datasources_api.create_data_source(deep_lynx.models.create_data_source_request.CreateDataSourceRequest(
-            os.getenv('DATA_SOURCE_NAME'), 'standard', True
-        ), container_id)
+        datasource = datasources_api.create_data_source(
+            deep_lynx.models.create_data_source_request.CreateDataSourceRequest(os.getenv('DATA_SOURCE_NAME'),
+                                                                                'standard', True), container_id)
         data_source_id = datasource.value.id
 
     return container_id, data_source_id, api_client

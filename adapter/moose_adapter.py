@@ -90,7 +90,10 @@ def createOutputFile():
     results.to_csv(os.getenv("IMPORT_FILE_NAME"), index=False)
 
 
-def importToDeepLynx(api_client: deep_lynx.ApiClient = None, container_id: str = '', data_source_id: str = '', event: dict = None):
+def importToDeepLynx(api_client: deep_lynx.ApiClient = None,
+                     container_id: str = '',
+                     data_source_id: str = '',
+                     event: dict = None):
     """
     Imports the results into Deep Lynx
     Args
@@ -142,7 +145,7 @@ def importToDeepLynx(api_client: deep_lynx.ApiClient = None, container_id: str =
     return False
 
 
-def main(dl_event=None, api_client: deep_lynx.ApiClient=None, container_id: str = '', data_source_id: str = ''):
+def main(dl_event=None, api_client: deep_lynx.ApiClient = None, container_id: str = '', data_source_id: str = ''):
     """
     Main entry point for script
     Args

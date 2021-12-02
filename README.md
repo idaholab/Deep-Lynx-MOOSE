@@ -30,6 +30,10 @@ Logs will be written to a logfile, stored in the root directory of the project. 
 ## MOOSE Dependencies
 The MOOSE Adapter uses the `pyhit` and `moosetree` modules within MOOSE. For more information, visit the `Helpful Links` section.
 
+## Contributing
+
+This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes (e.g. `yapf --in-place --recursive . --style={column_limit:120}`)
+
 ## Helpful Links
 * MOOSE Code
     * [pyhit](https://github.com/idaholab/moose/blob/next/python/pyhit/pyhit.py)

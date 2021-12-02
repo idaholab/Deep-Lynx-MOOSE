@@ -9,7 +9,9 @@ import deep_lynx
 import utils
 
 
-def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi = None, container_id: str = '', data_source_id: str = ''):
+def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi = None,
+                     container_id: str = '',
+                     data_source_id: str = ''):
     """
     Imports data into Deep Lynx
     Args
@@ -36,7 +38,10 @@ def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi = None, containe
             print("Could not import data into Deep Lynx. Check log file for more information")
 
 
-def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None, payload: list = None, container_id: str = '', data_source_id: str = ''):
+def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None,
+                         payload: list = None,
+                         container_id: str = '',
+                         data_source_id: str = ''):
     """
     Creates a manual import of the payload to insert into Deep Lynx
     Args
@@ -46,7 +51,9 @@ def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None, payl
         data_source_id (str): deep lynx data source id
     """
     if data_sources_api and payload:
-        return data_sources_api.create_manual_import(body=payload, container_id=container_id, data_source_id=data_source_id)
+        return data_sources_api.create_manual_import(body=payload,
+                                                     container_id=container_id,
+                                                     data_source_id=data_source_id)
 
 
 def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_paths: list, container_id: str, data_source_id: str):
@@ -64,6 +71,7 @@ def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_paths: list, co
         file_returns.append(data_sources_api.upload_file(container_id, data_source_id, file))
     return file_returns
 
+
 def generate_payload(data_file: str):
     """
     Generate a list of payloads to import into deep lynx
@@ -75,6 +83,7 @@ def generate_payload(data_file: str):
     """
     payload = dict()
     return payload
+
 
 def validate_payload(api_client: deep_lynx.ApiClient, payload: dict, container_id: str):
     """
