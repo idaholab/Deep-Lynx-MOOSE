@@ -27,7 +27,7 @@ def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi = None,
         data_file = os.getenv("IMPORT_FILE_NAME")
         # Generate a dictionary of payloads to import
         payload = generate_payload(data_file)
-        # Check if all payloads are valid 
+        # Check if all payloads are valid
         is_valid = validate_payload(api_client, payload, container_id)
         # Convert dictionary to list of payloads
         payload_list = list()
