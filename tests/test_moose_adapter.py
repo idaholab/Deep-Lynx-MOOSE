@@ -4,9 +4,6 @@ import pytest
 import os
 import logging
 
-import pyhit
-import moosetree
-
 from adapter import moose_adapter
 from adapter import settings
 

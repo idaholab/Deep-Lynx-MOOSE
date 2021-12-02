@@ -3,13 +3,11 @@
 import pytest
 import os
 import logging
-import deep_lynx
 
 import pyhit
 import moosetree
 
 from adapter import edit_input_file
-from adapter import settings
 
 
 class TestEditInputFile:
