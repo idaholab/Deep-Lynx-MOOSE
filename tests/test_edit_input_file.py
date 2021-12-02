@@ -3,13 +3,11 @@
 import pytest
 import os
 import logging
-import deep_lynx
 
 import pyhit
 import moosetree
 
 from adapter import edit_input_file
-from adapter import settings
 
 
 class TestEditInputFile:
@@ -90,6 +88,7 @@ class TestEditInputFile:
         Test Case (validateChangesToInputFile): Valid Deep Lynx json object with a correct node, parameter, and  value
         """
         jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
+        os.environ['CONFIG_FILE_NAME'] = self.CONFIG_FILE_NAME
         isValidated = edit_input_file.validateChangesToInputFile(jsonData)
         assert isValidated == True
 
@@ -133,6 +132,8 @@ class TestEditInputFile:
         Test Case (modifyInputFile): Input file is created
         """
         jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
+        os.environ['CONFIG_INPUT_FILE_NAME'] = self.CONFIG_INPUT_FILE_NAME
+        os.environ['RUN_FILE_NAME'] = self.RUN_FILE_NAME
         edit_input_file.modifyInputFile(jsonData)
         assert os.path.isfile(self.RUN_FILE_NAME) == True
         if os.path.isfile(self.RUN_FILE_NAME):

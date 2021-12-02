@@ -9,6 +9,7 @@ import environs
 import deep_lynx
 
 from . import moose_adapter
+from adapter.deep_lynx_query import deep_lynx_init
 import utils
 import settings
 
@@ -47,10 +48,8 @@ def create_app():
     env.int("IMPORT_FILE_WAIT_SECONDS")
     env.int("REGISTER_WAIT_SECONDS")
 
-    # Instantiate deep_lynx_service
-    dlService = deep_lynx.DeepLynxService(os.getenv('DEEP_LYNX_URL'), os.getenv('CONTAINER_NAME'),
-                                          os.getenv('DATA_SOURCE_NAME'))
-    dlService.init()
+    # Instantiate deep_lynx
+    container_id, data_source_id, api_client = deep_lynx_init()
 
     @app.route('/events', methods=['POST'])
     def events():
@@ -61,7 +60,8 @@ def create_app():
             data = request.get_json()
 
             logging.info('Received event with data: ' + json.dumps(data))
-            import_data = dlService.list_import_data(dlService.container_id, data['import_id'])
+            imports_api = deep_lynx.ImportsApi(api_client)
+            import_data = imports_api.list_imports_data(container_id, data['import_id'])
 
             # parse event data and run dt_driver main
             # check for event object type
@@ -73,7 +73,7 @@ def create_app():
                         print('New run event')
 
                         # if event object type with instruction 'run' is found,
-                        event_data = dlService.list_import_data(dlService.container_id, dl_event['import_id'])
+                        event_data = imports_api.list_imports_data(container_id, dl_event['import_id'])
 
                         if 'value' not in event_data:
                             return Response(response=json.dumps({'received': True}),
@@ -87,7 +87,9 @@ def create_app():
                         dl_event['received'] = True
                         dl_event['modifiedDate'] = datetime.datetime.now().isoformat()
                         dl_event['modifiedUser'] = os.getenv('DATA_SOURCE_NAME')
-                        dlService.create_manual_import(dlService.container_id, dlService.data_source_id, dl_event)
+
+                        datasource_api = deep_lynx.DataSourcesApi(api_client)
+                        datasource_api.create_manual_import(dl_event, container_id, data_source_id)
 
                         # TODO 1. Compile all events into an array of json objects called dl_event_data
                         # TODO 2. Call  moose_adapter.main() to run an input file in MOOSE
@@ -102,13 +104,13 @@ def create_app():
     # disable running the code twice upon start in development
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         # TODO: Uncomment when wanted to register for listening for events from other data sources
-        #register_for_event(dlService)
+        #register_for_event(container_id, api_client)
         print("")
 
     return app
 
 
-def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
+def register_for_event(container_id: str, api_client: deep_lynx.ApiClient, iterations=30):
     """ Register with Deep Lynx to receive data_ingested events on applicable data sources """
     registered = False
 
@@ -118,14 +120,17 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
     # Register events for listening from other data sources
     while not registered and iterations > 0:
         # Get a list of data sources and validate that no error occurred
-        data_sources = dlService.list_data_sources(dlService.container_id)
+        datasource_api = deep_lynx.DataSourcesApi(api_client)
+        data_sources = datasource_api.list_data_sources(container_id)
         if data_sources['isError'] == False:
             for data_source in data_sources['value']:
                 # If the data source is found, create a registered event
                 if data_source['name'] in data_ingested_adapters:
                     data_source_id = data_source['id']
                     container_id = data_source['container_id']
-                    dlService.create_registered_event({
+
+                    events_api = deep_lynx.EventsApi(api_client)
+                    events_api.create_registered_event({
                         "app_name":
                         os.getenv('DATA_SOURCE_NAME'),
                         "app_url":
@@ -139,7 +144,7 @@ def register_for_event(dlService: deep_lynx.DeepLynxService, iterations=30):
                     })
 
                     # Verify the event was registered
-                    registered_events = dlService.list_registered_events()
+                    registered_events = events_api.list_registered_events()
                     if registered_events['isError'] == False:
                         registered_events = registered_events['value']
                         if registered_events:

@@ -10,18 +10,16 @@ import deep_lynx
 import utils
 from adapter.deep_lynx_query import deep_lynx_query
 from adapter.deep_lynx_import import deep_lynx_import
-import settings
+from adapter.deep_lynx_query import deep_lynx_init
 
-import pyhit
-import moosetree
 import mooseutils
 
 
-def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None, dl_event: list = None):
+def queryDeepLynx(api_client: deep_lynx.ApiClient = None, dl_events: list = None):
     """
     Query Deep Lynx for data
     Args
-        dl_service (DeepLynxService): deep lynx service object
+        api_client (ApiClient): deep lynx api client
         dl_event (list): a list of json objects from a deep lynx event
     Return
         True: if query file is found
@@ -30,7 +28,12 @@ def queryDeepLynx(dlService: deep_lynx.DeepLynxService = None, dl_event: list = 
     done = False
     didSucceed = False
     start = time.time()
-    deep_lynx_query(dlService, dl_event)
+
+    data_query_api = None
+    if api_client is not None:
+        data_query_api = deep_lynx.DataQueryApi(api_client)
+
+    deep_lynx_query(data_query_api, dl_events)
     path = os.path.join(os.getcwd() + '/' + os.getenv('QUERY_FILE_NAME'))
     while not done:
         # Check if query file exists
@@ -87,11 +90,16 @@ def createOutputFile():
     results.to_csv(os.getenv("IMPORT_FILE_NAME"), index=False)
 
 
-def importToDeepLynx(dlService: deep_lynx.DeepLynxService = None, event: dict = None):
+def importToDeepLynx(api_client: deep_lynx.ApiClient = None,
+                     container_id: str = '',
+                     data_source_id: str = '',
+                     event: dict = None):
     """
     Imports the results into Deep Lynx
     Args
-        dl_service (DeepLynxService): deep lynx service object
+        api_client (ApiClient): deep lynx api client
+        container_id (str): deep lynx container id
+        data_source_id (str): deep lynx data source id
         event (dictionary): a dictionary of the event information
     """
     done = False
@@ -103,14 +111,15 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService = None, event: dict = 
         if os.path.exists(path):
             logging.info(f'Found {os.getenv("IMPORT_FILE_NAME")}.')
             # Import data into Deep Lynx
-            deep_lynx_import(dlService)
+            data_sources_api = deep_lynx.DataSourcesApi(api_client)
+            deep_lynx_import(data_sources_api, api_client, container_id, data_source_id)
             logging.info('Success: Run complete. Output data sent.')
 
             if event:
                 # Send event signaling MOOSE is done
                 event['status'] = 'complete'
                 event['modifiedDate'] = datetime.datetime.now().isoformat()
-                dlService.create_manual_import(dlService.container_id, dlService.data_source_id, event)
+                data_sources_api.create_manual_import(event, container_id, data_source_id)
                 logging.info('Event sent.')
             done = True
             didSucceed = True
@@ -136,19 +145,28 @@ def importToDeepLynx(dlService: deep_lynx.DeepLynxService = None, event: dict = 
     return False
 
 
-def main(dl_event=None, dlService=None):
+def main(dl_event=None, api_client: deep_lynx.ApiClient = None, container_id: str = '', data_source_id: str = ''):
     """
     Main entry point for script
+    Args
+        api_client (ApiClient): deep lynx api client
+        container_id (str): deep lynx container id
+        data_source_id (str): deep lynx data source id
     """
 
     logging.info('MOOSE Adapter started. Using input file %s and configuration file %s',
                  os.getenv('CONFIG_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
-    doesQueryFileExist = queryDeepLynx(dlService, dl_event)
+
+    # instantiate deep_lynx client if necessary
+    if api_client is None:
+        container_id, data_source_id, api_client = deep_lynx_init()
+
+    doesQueryFileExist = queryDeepLynx(api_client, container_id, data_source_id, dl_event)
     if doesQueryFileExist:
         isRun = runInputFile()
     if isRun:
         createOutputFile()
-        isImported = importToDeepLynx(dlService)
+        isImported = importToDeepLynx(api_client, container_id, data_source_id)
         return isImported
     return False
 

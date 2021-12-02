@@ -9,7 +9,6 @@ import pyhit
 import moosetree
 
 from adapter import template_parser
-from adapter import settings
 
 
 class TestEditInputFile:
