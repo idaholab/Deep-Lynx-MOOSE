@@ -1,80 +1,104 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
+# Python Packages
 import os
-import json
-
-from deep_lynx.api_client import ApiClient
-import settings
-import pandas as pd
 import logging
 import deep_lynx
-import utils
+import json
+import time
+
+# Repository Modules
+import adapter
 
 
-def deep_lynx_import(data_sources_api: deep_lynx.DataSourcesApi = None,
-                     api_client: ApiClient = None,
-                     container_id: str = '',
-                     data_source_id: str = ''):
+def import_to_deep_lynx(import_file: str):
     """
-    Imports data into Deep Lynx
+    Import data into Deep Lynx
+    Args
+        import_file (string): the file path to import into Deep Lynx
+    """
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
+    done = False
+    did_succeed = False
+    start = time.time()
+    path = os.path.join(os.getcwd() + '/' + import_file)
+    while not done:
+        # Check if import file exists
+        if os.path.exists(path):
+            logging.info(f'Found {import_file}.')
+            # Import data into Deep Lynx
+            data_sources_api = deep_lynx.DataSourcesApi(api_client)
+            info = upload_file(data_sources_api, import_file)
+            logging.info('Success: Run complete. Output data sent.')
+            done = True
+            did_succeed = True
+            break
+        else:
+            logging.info(
+                f'Fail: {import_file} not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds')
+            end = time.time()
+            # Break out of infinite loop
+            if end - start > float(os.getenv("IMPORT_FILE_WAIT_SECONDS")) * 20:
+                logging.info(f'Fail: In the final attempt, {import_file} was not found.')
+                done = True
+                break
+            # Sleep for wait seconds
+            else:
+                logging.info(
+                    f'Fail: {import_file} was not found. Trying again in {os.getenv("IMPORT_FILE_WAIT_SECONDS")} seconds'
+                )
+                time.sleep(int(os.getenv("IMPORT_FILE_WAIT_SECONDS")))
+    if did_succeed:
+        return True
+    return False
+
+
+def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_path: str):
+    """
+    Uploads a file into Deep Lynx   
     Args
         data_sources_api (deep_lynx.DataSourcesApi): deep lynx data source api
-        container_id (str): deep lynx container id
-        data_source_id (str): deep lynx data source id
+        file_path (string): the file path to import into Deep Lynx
     """
-    if data_sources_api:
-        # Location of file to read
-        data_file = os.getenv("IMPORT_FILE_NAME")
-        # Generate a dictionary of payloads to import
-        payload = generate_payload(data_file)
-        # Check if all payloads are valid
-        is_valid = validate_payload(api_client, payload, container_id)
-        # Convert dictionary to list of payloads
-        payload_list = list()
-        for key in payload.keys():
-            payload_list.extend(payload[key])
-        # Manually import the data
-        info = create_manual_import(data_sources_api, payload_list, container_id, data_source_id)
-        if info and info['isError'] == False:
-            logging.info("Successfully imported data to deep lynx")
-            print("Successfully imported data to deep lynx")
-        else:
-            logging.error(info)
-            print("Could not import data into Deep Lynx. Check log file for more information")
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
+    file_return = data_sources_api.upload_file(container_id,
+                                               data_source_id,
+                                               file=file_path,
+                                               metadata=os.getenv("METADATA"),
+                                               async_req=False)
+    if len(file_return["value"]) > 0:
+        logging.info("Successfully imported data to deep lynx")
+        print("Successfully imported data to deep lynx")
+    else:
+        logging.error("Could not import data into Deep Lynx. Check log file for more information")
+        print("Could not import data into Deep Lynx. Check log file for more information")
+    return file_return
 
 
-def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None,
-                         payload: list = None,
-                         container_id: str = '',
-                         data_source_id: str = ''):
+def create_manual_import(data_sources_api: deep_lynx.DataSourcesApi = None, payload: list = None):
     """
     Creates a manual import of the payload to insert into Deep Lynx
     Args
         data_sources_api (deep_lynx.DataSourcesApi): deep lynx data source api
         payload (list): a list of payloads to import into deep lynx
-        container_id (str): deep lynx container id
-        data_source_id (str): deep lynx data source id
     """
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
     if data_sources_api and payload:
         return data_sources_api.create_manual_import(body=payload,
                                                      container_id=container_id,
                                                      data_source_id=data_source_id)
-
-
-def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_paths: list, container_id: str, data_source_id: str):
-    """
-    Uploads a file into Deep Lynx   
-    Args
-        data_sources_api (deep_lynx.DataSourcesApi): deep lynx data source api
-        file_paths (list): An array of strings with locations to each file
-        to be uploaded.
-        container_id (str): deep lynx container id
-        data_source_id (str): deep lynx data source id
-    """
-    file_returns = []
-    for file in file_paths:
-        file_returns.append(data_sources_api.upload_file(container_id, data_source_id, file))
-    return file_returns
 
 
 def generate_payload(data_file: str):
@@ -90,17 +114,21 @@ def generate_payload(data_file: str):
     return payload
 
 
-def validate_payload(api_client: deep_lynx.ApiClient, payload: dict, container_id: str):
+def validate_payload(payload: dict):
     """
     Validates the payload before inserting into deep lynx
     
     Args
-        api_client (deep_lynx.ApiClien): deep lynx api client
         payload (dictionary): a dictionary of payloads to import into deep lynx e.g. {metatype: list(payload)}
-        container_id (str): deep lynx container id
+
     Return
         is_valid (boolean): whether the payload is valid or not
     """
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
     # Create deep lynx validator object
     metatypes_api = deep_lynx.MetatypesApi(api_client)
     is_valid = True

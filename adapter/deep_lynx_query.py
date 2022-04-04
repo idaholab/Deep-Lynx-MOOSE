@@ -1,137 +1,94 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
+# Python Packages
 import os
-import json
-import settings
 import pandas as pd
 import deep_lynx
 
+# Repository Modules
+import settings
+import adapter
 
-def deep_lynx_query(dl_service: deep_lynx.DataQueryApi = None, dl_events: list = None):
+
+def query_deep_lynx(file_id: str):
     """
-    Queries deep lynx for data and writes the dataset to .csv file
+    Retrieve data from Deep Lynx
     Args
-        dl_service (deep_lynx.DataQueryApi): deep lynx query api
-        dl_events (list): a list of json objects from a deep lynx event
+        file_id (string): the id of a file stored in Deep Lynx
     """
-    if dl_service:
-        # Location of the file to write
-        data_file = os.getenv("QUERY_FILE_NAME")
-        # Compile data by querying Deep Lynx
-        dataset = compile_data(dl_service)
-        # Write dataset to csv file
-        write_csv(dataset, data_file)
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
+    # Retrieve file from Deep Lynx
+    data_sources_api = deep_lynx.DataSourcesApi(api_client)
+    dl_file_path = retrieve_file(data_sources_api, file_id)
+
+    # Write csv to local repository
+    query_df = pd.read_csv(dl_file_path)
+    queue(query_df)
 
 
-def query(dl_service: deep_lynx.DataQueryApi, payload: str, container_id: str):
-    """
-    Queries Deep Lynx for nodes or edges
-    Args
-        dl_service (deep_lynx.DataQueryApi): deep lynx query api
-        payload (string): the graphQL query
-        container_id (str): deep lynx container id
-    Return 
-        data (dictionary): a dictionary of nodes or edges
-        
-    """
-    data = dl_service.query_graph(body=payload, container_id=container_id)
-    return data
-
-
-def download_file(dl_service: deep_lynx.DataSourcesApi, file_id: str, container_id: str):
+def download_file(dl_service: deep_lynx.DataSourcesApi, file_id: str):
     """
     Downloads a file from Deep Lynx
     Args
         dl_service (deep_lynx.DataSourcesApi): deep lynx data source api
         file_id (string): the id of a file
-        container_id (str): deep lynx container id
     """
-    return dl_service.download_file(container_id=container_id, file_id=file_id)
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
+    download_file = dl_service.download_file(container_id, file_id)
+
+    if not download_file.is_error:
+        return download_file
 
 
-def retrieve_file(dl_service: deep_lynx.DataSourcesApi, file_id: str, container_id: str):
+def retrieve_file(data_sources_api: deep_lynx.DataSourcesApi, file_id: str):
     """
-    Retrieves a file from Deep Lynx
+    Retrieve a file from Deep Lynx
     Args
-        dl_service (deep_lynx.DataSourcesApi): deep lynx data source api
+        data_sources_api (deep_lynx.DataSourcesApi): deep lynx data source api
         file_id (string): the id of a file
         container_id (str): deep lynx container id
     """
-    return dl_service.retrieve_file(container_id=container_id, file_id=file_id)
+    # Get deep lynx environment variables
+    api_client = adapter.api_client
+    container_id = os.environ["CONTAINER_ID"]
+    data_source_id = os.environ["DATA_SOURCE_ID"]
+
+    retrieve_file = data_sources_api.retrieve_file(container_id, file_id)
+
+    if not retrieve_file.is_error:
+        retrieve_file = retrieve_file.to_dict()["value"]
+        path = retrieve_file["adapter_file_path"] + retrieve_file["file_name"]
+        return path
 
 
-def compile_data(dl_service: deep_lynx.DataQueryApi, dl_event: list = None):
+def queue(query_df: pd.DataFrame or pd.Series):
     """
-    Complies a dataset from deep lynx queries
+    Maintains a queue file of a given length via the First In First Out (FIFO) data structure
     Args
-        dl_service (deep_lynx.DataQueryApi): deep lynx query api
-        dl_event (list): a list of json objects from a deep lynx event
-    Return
-        dataset (DataFrame or Series): a pandas DataFrame or Series of the data
+        query_df (DataFrame or Series): data to add to the queue
     """
-    dataset = pd.DataFrame()
-    return dataset
-
-
-def write_csv(dataset: pd.DataFrame or pd.Series, path: str):
-    """
-    Writes the dataset to .csv file
-    Args
-        dataset (DataFrame or Series): a pandas DataFrame or Series of the data
-        path (string): the file path to write the data to e.g. data/*.csv
-    """
-    dataset.to_csv(path, index=False)
-
-
-def deep_lynx_init():
-    """ 
-    Returns the container id, data source id, and api client for use with the DeepLynx SDK.
-    Assumes token authentication. 
-
-    Args
-        None
-    Return
-        container_id (str), data_source_id (str), api_client (ApiClient)
-    """
-    # initialize an ApiClient for use with deep_lynx APIs
-    configuration = deep_lynx.configuration.Configuration()
-    configuration.host = os.getenv('DEEP_LYNX_URL')
-    api_client = deep_lynx.ApiClient(configuration)
-
-    # authenticate via an API key and secret
-    auth_api = deep_lynx.AuthenticationApi(api_client)
-    token = auth_api.retrieve_o_auth_token(x_api_key=os.getenv('DEEP_LYNX_API_KEY'),
-                                           x_api_secret=os.getenv('DEEP_LYNX_API_SECRET'),
-                                           x_api_expiry='12h')
-
-    # update header
-    api_client.set_default_header('Authorization', 'Bearer {}'.format(token))
-
-    # get container ID
-    container_id = None
-    container_api = deep_lynx.ContainersApi(api_client)
-    containers = container_api.list_containers()
-    for container in containers.value:
-        if container.name == os.getenv('CONTAINER_NAME'):
-            container_id = container.id
-            continue
-
-    if container_id is None:
-        print('Container not found')
-        return None, None, None
-
-    # get data source ID, create if necessary
-    data_source_id = None
-    datasources_api = deep_lynx.DataSourcesApi(api_client)
-
-    datasources = datasources_api.list_data_sources(container_id)
-    for datasource in datasources.value:
-        if datasource.name == os.getenv('DATA_SOURCE_NAME'):
-            data_source_id = datasource.id
-    if data_source_id is None:
-        datasource = datasources_api.create_data_source(
-            deep_lynx.models.create_data_source_request.CreateDataSourceRequest(os.getenv('DATA_SOURCE_NAME'),
-                                                                                'standard', True), container_id)
-        data_source_id = datasource.value.id
-
-    return container_id, data_source_id, api_client
+    # Applies a lock for threading
+    with adapter.lock_:
+        if os.path.exists(os.getenv("QUEUE_FILE_NAME")):
+            # Read master queue file
+            queue_df = pd.read_csv(os.getenv("QUEUE_FILE_NAME"))
+            # Append query file to queue
+            queue_df = queue_df.append(query_df, ignore_index=True)
+        else:
+            # If queue file does not exist
+            queue_df = query_df
+        new_queue_length = queue_df.shape[0]
+        # Keep queue at given length
+        if new_queue_length > int(os.getenv("QUEUE_LENGTH")):
+            subtract_length = new_queue_length - int(os.getenv("QUEUE_LENGTH"))
+            queue_df.drop([i for i in range(subtract_length)], axis=0, inplace=True)
+        # Write queue to csv
+        queue_df.to_csv(os.getenv("QUEUE_FILE_NAME"), index=False)

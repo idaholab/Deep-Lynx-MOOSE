@@ -1,11 +1,13 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
+# Python Packages
 import pytest
 import os
 import logging
 
+# Repository Modules
 from adapter import moose_adapter
-from adapter import settings
+import settings
 
 
 class TestMOOSEAdapter:
@@ -30,7 +32,6 @@ class TestMOOSEAdapter:
     CONFIG_FILE_NAME = os.path.join('data', 'example', 'config_file.cfg')
     RUN_FILE_NAME = os.path.join('data', 'example', 'run_file.i')
     IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')
-    QUERY_FILE_WAIT_SECONDS = 1
     IMPORT_FILE_WAIT_SECONDS = 1
     REGISTER_WAIT_SECONDS = 1
 
@@ -40,8 +41,8 @@ class TestMOOSEAdapter:
         Test Case (queryDeepLynx): query file exists and is found
         """
         os.environ['QUERY_FILE_NAME'] = self.QUERY_FILE_NAME
-        isFound = moose_adapter.queryDeepLynx()
-        assert isFound == True
+        is_found = moose_adapter.queryDeepLynx()
+        assert is_found == True
 
     def test_invalid_query_deep_lynx(self):
         """
@@ -50,28 +51,27 @@ class TestMOOSEAdapter:
         """
         # Invalid path to query file
         os.environ['QUERY_FILE_NAME'] = os.path.join('data', 'query_file.csv')
-        os.environ['QUERY_FILE_WAIT_SECONDS'] = "1"
-        isFound = moose_adapter.queryDeepLynx()
-        assert isFound == False
+        is_found = moose_adapter.queryDeepLynx()
+        assert is_found == False
 
     def test_valid_run_input_file(self):
         """
         Validate that the input file is successfully run in MOOSE
-        Test Case (runInputFile): Successful run in MOOSE
+        Test Case (run_input_file): Successful run in MOOSE
         """
         os.environ['RUN_FILE_NAME'] = self.RUN_FILE_NAME
-        isRun = moose_adapter.runInputFile()
-        assert isRun == True
+        is_run = moose_adapter.run_input_file()
+        assert is_run == True
 
     def test_invalid_run_input_file(self):
         """
         Validate that the input file is run in MOOSE
-        Test Case (runInputFile): Failed run in MOOSE
+        Test Case (run_input_file): Failed run in MOOSE
         """
         # Invalid moose executable path
         os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'moose_test-opt')
         with pytest.raises(FileNotFoundError):
-            moose_adapter.runInputFile()
+            moose_adapter.run_input_file()
 
     def test_valid_import_to_deep_lynx(self):
         """
@@ -79,8 +79,8 @@ class TestMOOSEAdapter:
         Test Case (importToDeepLynx): imort file exists and is found
         """
         os.environ['IMPORT_FILE_NAME'] = self.IMPORT_FILE_NAME
-        isFound = moose_adapter.importToDeepLynx()
-        assert isFound == True
+        is_found = moose_adapter.importToDeepLynx()
+        assert is_found == True
 
     def test_invalid_import_to_deep_lynx(self):
         """
@@ -90,5 +90,5 @@ class TestMOOSEAdapter:
         # Invalid path to query file
         os.environ['IMPORT_FILE_NAME'] = os.path.join('data', 'import_file.csv')
         os.environ['IMPORT_FILE_WAIT_SECONDS'] = "1"
-        isFound = moose_adapter.importToDeepLynx()
-        assert isFound == False
+        is_found = moose_adapter.importToDeepLynx()
+        assert is_found == False
