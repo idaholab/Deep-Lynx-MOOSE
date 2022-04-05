@@ -6,7 +6,7 @@ import logging
 import configparser
 
 
-def validateExtension(extension: str, *args):
+def validate_extension(extension: str, *args):
     """
     Validates that the file has the provided extension
     Args
@@ -24,7 +24,7 @@ def validateExtension(extension: str, *args):
             raise TypeError(error)
 
 
-def validatePathsExist(*args):
+def validate_paths_exist(*args):
     """
     Check if the files or directories exist in the system path
     Args

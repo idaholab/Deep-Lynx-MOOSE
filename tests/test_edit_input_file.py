@@ -1,13 +1,16 @@
 # Copyright 2021, Battelle Energy Alliance, LLC
 
+# Python Packages
 import pytest
 import os
 import logging
 
+# Repository Modules
+from adapter import edit_input_file
+
+# MOOSE Modules
 import pyhit
 import moosetree
-
-from adapter import edit_input_file
 
 
 class TestEditInputFile:
@@ -33,77 +36,76 @@ class TestEditInputFile:
     CONFIG_FILE_NAME = os.path.join('tests', 'test_files', 'test01.cfg')
     RUN_FILE_NAME = os.path.join('tests', 'test_files', 'test01_run.i')
     IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')
-    QUERY_FILE_WAIT_SECONDS = 5
     IMPORT_FILE_WAIT_SECONDS = 5
     REGISTER_WAIT_SECONDS = 5
 
     def test_valid_json_data(self):
         """
         Assert that a valid list of json objects was returned
-        Test Case (createJSONData): Valid list of json objects that contain the correct information
+        Test Case (create_json_data): Valid list of json objects that contain the correct information
             """
-        jsonData = edit_input_file.createJSONData()
-        for i in range(len(jsonData)):
-            assert isinstance(jsonData, list) == True
-            assert isinstance(jsonData[i], dict) == True
-            node = jsonData[i].get('node', 'not exist')
+        json_data = edit_input_file.create_json_data()
+        for i in range(len(json_data)):
+            assert isinstance(json_data, list) == True
+            assert isinstance(json_data[i], dict) == True
+            node = json_data[i].get('node', 'not exist')
             assert node != 'not exist'
-            parameter = jsonData[i].get('parameter', 'not exist')
+            parameter = json_data[i].get('parameter', 'not exist')
             assert parameter != 'not exist'
-            value = jsonData[i].get('value', 'not exist')
+            value = json_data[i].get('value', 'not exist')
             assert value != 'not exist'
-            notExist = jsonData[i].get('city', 'not exist')
-            assert notExist == 'not exist'
+            not_exist = json_data[i].get('city', 'not exist')
+            assert not_exist == 'not exist'
 
     def test_invalid_node(self):
         """
         Assert that an incorrect json object is provided 
-        Test Case (validateChangesToInputFile): Invalid Deep Lynx json object because an invalid node is provided
+        Test Case (validate_changes_to_input_file): Invalid Deep Lynx json object because an invalid node is provided
         """
-        jsonData = [{"node": "/B", "parameter": "year", "value": 2000}]
-        isValidated = edit_input_file.validateChangesToInputFile(jsonData)
-        assert isValidated == False
+        json_data = [{"node": "/B", "parameter": "year", "value": 2000}]
+        is_validated = edit_input_file.validate_changes_to_input_file(json_data)
+        assert is_validated == False
 
     def test_invalid_parameter(self):
         """
         Assert that an incorrect json object is provided 
-        Test Case (validateChangesToInputFile): Invalid Deep Lynx json object because an invalid parameter is provided
+        Test Case (validate_changes_to_input_file): Invalid Deep Lynx json object because an invalid parameter is provided
         """
-        jsonData = [{"node": "/A", "parameter": "decade", "value": 8}]
-        isValidated = edit_input_file.validateChangesToInputFile(jsonData)
-        assert isValidated == False
+        json_data = [{"node": "/A", "parameter": "decade", "value": 8}]
+        is_validated = edit_input_file.validate_changes_to_input_file(json_data)
+        assert is_validated == False
 
     def test_invalid_value(self):
         """
         Assert that an incorrect json object is provided 
-        Test Case (validateChangesToInputFile): Invalid Deep Lynx json object because an invalid value is provided
+        Test Case (validate_changes_to_input_file): Invalid Deep Lynx json object because an invalid value is provided
         """
-        jsonData = [{"node": "/A", "parameter": "year", "value": '2000'}]
-        isValidated = edit_input_file.validateChangesToInputFile(jsonData)
-        assert isValidated == False
+        json_data = [{"node": "/A", "parameter": "year", "value": '2000'}]
+        is_validated = edit_input_file.validate_changes_to_input_file(json_data)
+        assert is_validated == False
 
     def test_valid_node_parameter_value(self):
         """
         Assert that a correct json object is provided 
-        Test Case (validateChangesToInputFile): Valid Deep Lynx json object with a correct node, parameter, and  value
+        Test Case (validate_changes_to_input_file): Valid Deep Lynx json object with a correct node, parameter, and  value
         """
-        jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
+        json_data = [{"node": "/A", "parameter": "year", "value": 2000}]
         os.environ['CONFIG_FILE_NAME'] = self.CONFIG_FILE_NAME
-        isValidated = edit_input_file.validateChangesToInputFile(jsonData)
-        assert isValidated == True
+        is_validated = edit_input_file.validate_changes_to_input_file(json_data)
+        assert is_validated == True
 
     def test_valid_update_parameter_value(self):
         """
         Assert that for a parameter of a node, the value was updated and a comment with {{change}} was added
-        Test Case (updateParameterValues): The value of a parameter was updated
+        Test Case (update_parameter_values): The value of a parameter was updated
         """
-        jsonObj = {"node": "/A", "parameter": "year", "value": 2000}
+        json_object = {"node": "/A", "parameter": "year", "value": 2000}
         # Read the file
         root = pyhit.load(os.path.abspath(self.CONFIG_INPUT_FILE_NAME))
         # Get nodes
         nodes = list(moosetree.iterate(root, method=moosetree.IterMethod.PRE_ORDER))
         for node in nodes:
-            edit_input_file.updateParameterValues(node, jsonObj)
+            edit_input_file.update_parameter_values(node, json_object)
             assert node['year'] == 2000
             comment = node.comment(param='year')
             assert comment.find('{{change}}') != -1
@@ -111,30 +113,30 @@ class TestEditInputFile:
     def test_valid_remove_config_comments(self):
         """
         Assert that a comment with {{config}} was not found
-        Test Case (removeConfigComments): No {{config}} in the comments
+        Test Case (remove_config_comments): No {{config}} in the comments
         """
-        jsonObj = {"node": "/A", "parameter": "year", "value": 2000}
+        json_object = {"node": "/A", "parameter": "year", "value": 2000}
         # Read the file
         root = pyhit.load(os.path.abspath(self.CONFIG_INPUT_FILE_NAME))
         # Get nodes
         nodes = list(moosetree.iterate(root, method=moosetree.IterMethod.PRE_ORDER))
         for node in nodes:
-            edit_input_file.updateParameterValues(node, jsonObj)
-            edit_input_file.removeConfigComments(node)
-            yearComment = node.comment(param='year')
-            assert yearComment.find('{{config}}') == -1
-            monthComment = node.comment(param='month')
-            assert monthComment.find('{{config}}') == -1
+            edit_input_file.update_parameter_values(node, json_object)
+            edit_input_file.remove_config_comments(node)
+            year_comment = node.comment(param='year')
+            assert year_comment.find('{{config}}') == -1
+            month_comment = node.comment(param='month')
+            assert month_comment.find('{{config}}') == -1
 
     def test_valid_modify_input_file(self):
         """
         Assert that a input file was created
-        Test Case (modifyInputFile): Input file is created
+        Test Case (modify_input_file): Input file is created
         """
-        jsonData = [{"node": "/A", "parameter": "year", "value": 2000}]
+        json_data = [{"node": "/A", "parameter": "year", "value": 2000}]
         os.environ['CONFIG_INPUT_FILE_NAME'] = self.CONFIG_INPUT_FILE_NAME
         os.environ['RUN_FILE_NAME'] = self.RUN_FILE_NAME
-        edit_input_file.modifyInputFile(jsonData)
+        edit_input_file.modify_input_file(json_data)
         assert os.path.isfile(self.RUN_FILE_NAME) == True
         if os.path.isfile(self.RUN_FILE_NAME):
             os.remove(self.RUN_FILE_NAME)

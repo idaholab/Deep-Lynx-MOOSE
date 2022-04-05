@@ -3,6 +3,3 @@
 *
 # Except these files/directories
 !.gitignore
-!/example
-!/example/*
-!queue/
