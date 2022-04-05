@@ -35,25 +35,6 @@ class TestMOOSEAdapter:
     IMPORT_FILE_WAIT_SECONDS = 1
     REGISTER_WAIT_SECONDS = 1
 
-    def test_valid_query_deep_lynx(self):
-        """
-        Validate that the query file is found
-        Test Case (queryDeepLynx): query file exists and is found
-        """
-        os.environ['QUERY_FILE_NAME'] = self.QUERY_FILE_NAME
-        is_found = moose_adapter.queryDeepLynx()
-        assert is_found == True
-
-    def test_invalid_query_deep_lynx(self):
-        """
-        Validate that the query file is not found
-        Test Case (queryDeepLynx): query file does not exist and is not found
-        """
-        # Invalid path to query file
-        os.environ['QUERY_FILE_NAME'] = os.path.join('data', 'query_file.csv')
-        is_found = moose_adapter.queryDeepLynx()
-        assert is_found == False
-
     def test_valid_run_input_file(self):
         """
         Validate that the input file is successfully run in MOOSE
@@ -72,23 +53,3 @@ class TestMOOSEAdapter:
         os.environ['MOOSE_OPT_PATH'] = os.path.join('~', 'projects', 'moose', 'moose_test-opt')
         with pytest.raises(FileNotFoundError):
             moose_adapter.run_input_file()
-
-    def test_valid_import_to_deep_lynx(self):
-        """
-        Validate that the import file is found
-        Test Case (importToDeepLynx): imort file exists and is found
-        """
-        os.environ['IMPORT_FILE_NAME'] = self.IMPORT_FILE_NAME
-        is_found = moose_adapter.importToDeepLynx()
-        assert is_found == True
-
-    def test_invalid_import_to_deep_lynx(self):
-        """
-        Validate that the import file is not found
-        Test Case (importToDeepLynx): import file does not exist and is not found
-        """
-        # Invalid path to query file
-        os.environ['IMPORT_FILE_NAME'] = os.path.join('data', 'import_file.csv')
-        os.environ['IMPORT_FILE_WAIT_SECONDS'] = "1"
-        is_found = moose_adapter.importToDeepLynx()
-        assert is_found == False

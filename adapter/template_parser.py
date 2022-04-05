@@ -47,7 +47,7 @@ def get_input_file_path(args):
     if args.input_file is not None:
         input_file = args.input_file[0]
     else:
-        input_file = os.getenv("INPUT_FILE_NAME")
+        input_file = os.getenv("CONFIG_INPUT_FILE_NAME")
         is_env_variable = True
     return input_file, is_env_variable
 

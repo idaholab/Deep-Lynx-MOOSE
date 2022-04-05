@@ -12,3 +12,4 @@ test.log
 .DS_Store
 tests/reports/test-results.xml
 *.xml
+*.lock
