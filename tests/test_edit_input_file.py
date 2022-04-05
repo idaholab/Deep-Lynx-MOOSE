@@ -32,7 +32,7 @@ class TestEditInputFile:
     PYTHONPATH = os.path.join('~', 'projects', 'moose', 'python')
     MOOSE_OPT_PATH = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
     QUERY_FILE_NAME = os.path.join('data', 'example', 'query_file.csv')
-    CONFIG_INPUT_FILE_NAME = os.path.join('tests', 'test_files', 'test01.i')
+    TEMPLATE_INPUT_FILE_NAME = os.path.join('tests', 'test_files', 'test01.i')
     CONFIG_FILE_NAME = os.path.join('tests', 'test_files', 'test01.cfg')
     RUN_FILE_NAME = os.path.join('tests', 'test_files', 'test01_run.i')
     IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')
@@ -101,7 +101,7 @@ class TestEditInputFile:
         """
         json_object = {"node": "/A", "parameter": "year", "value": 2000}
         # Read the file
-        root = pyhit.load(os.path.abspath(self.CONFIG_INPUT_FILE_NAME))
+        root = pyhit.load(os.path.abspath(self.TEMPLATE_INPUT_FILE_NAME))
         # Get nodes
         nodes = list(moosetree.iterate(root, method=moosetree.IterMethod.PRE_ORDER))
         for node in nodes:
@@ -117,7 +117,7 @@ class TestEditInputFile:
         """
         json_object = {"node": "/A", "parameter": "year", "value": 2000}
         # Read the file
-        root = pyhit.load(os.path.abspath(self.CONFIG_INPUT_FILE_NAME))
+        root = pyhit.load(os.path.abspath(self.TEMPLATE_INPUT_FILE_NAME))
         # Get nodes
         nodes = list(moosetree.iterate(root, method=moosetree.IterMethod.PRE_ORDER))
         for node in nodes:
@@ -134,7 +134,7 @@ class TestEditInputFile:
         Test Case (modify_input_file): Input file is created
         """
         json_data = [{"node": "/A", "parameter": "year", "value": 2000}]
-        os.environ['CONFIG_INPUT_FILE_NAME'] = self.CONFIG_INPUT_FILE_NAME
+        os.environ['TEMPLATE_INPUT_FILE_NAME'] = self.TEMPLATE_INPUT_FILE_NAME
         os.environ['RUN_FILE_NAME'] = self.RUN_FILE_NAME
         edit_input_file.modify_input_file(json_data)
         assert os.path.isfile(self.RUN_FILE_NAME) == True

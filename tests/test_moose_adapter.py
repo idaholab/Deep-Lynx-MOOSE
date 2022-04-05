@@ -28,7 +28,7 @@ class TestMOOSEAdapter:
     PYTHONPATH = os.path.join('~', 'projects', 'moose', 'python')
     MOOSE_OPT_PATH = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
     QUERY_FILE_NAME = os.path.join('data', 'example', 'query_file.csv')
-    CONFIG_INPUT_FILE_NAME = os.path.join('data', 'example', 'config_input_file.i')
+    TEMPLATE_INPUT_FILE_NAME = os.path.join('data', 'example', 'config_input_file.i')
     CONFIG_FILE_NAME = os.path.join('data', 'example', 'config_file.cfg')
     RUN_FILE_NAME = os.path.join('data', 'example', 'run_file.i')
     IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')

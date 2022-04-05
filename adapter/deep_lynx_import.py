@@ -72,7 +72,7 @@ def upload_file(data_sources_api: deep_lynx.DataSourcesApi, file_path: str):
     file_return = data_sources_api.upload_file(container_id,
                                                data_source_id,
                                                file=file_path,
-                                               metadata=os.getenv("METADATA"),
+                                               metadata=os.getenv("METADATA_FILE_NAME"),
                                                async_req=False)
     if len(file_return["value"]) > 0:
         logging.info("Successfully imported data to deep lynx")
