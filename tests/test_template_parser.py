@@ -33,7 +33,7 @@ class TestEditInputFile:
     PYTHONPATH = os.path.join('~', 'projects', 'moose', 'python')
     MOOSE_OPT_PATH = os.path.join('~', 'projects', 'moose', 'test', 'moose_test-opt')
     QUERY_FILE_NAME = os.path.join('data', 'example', 'query_file.csv')
-    CONFIG_INPUT_FILE_NAME = os.path.join('tests', 'test_files', 'test01.i')
+    TEMPLATE_INPUT_FILE_NAME = os.path.join('tests', 'test_files', 'test01.i')
     CONFIG_FILE_NAME = os.path.join('tests', 'test_files', 'test01.cfg')
     RUN_FILE_NAME = os.path.join('tests', 'test_files', 'test01_run.i')
     IMPORT_FILE_NAME = os.path.join('data', 'example', 'import_file.csv')
@@ -69,7 +69,7 @@ class TestEditInputFile:
         args = template_parser.get_parser_arguments()
         input_file, is_env_variable = template_parser.get_input_file_path(args)
         assert is_env_variable == True
-        assert input_file == os.getenv("CONFIG_INPUT_FILE_NAME")
+        assert input_file == os.getenv("TEMPLATE_INPUT_FILE_NAME")
 
     def test_valid_console_input_file_path(self):
         """

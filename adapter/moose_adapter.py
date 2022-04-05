@@ -53,7 +53,7 @@ def main():
     """
 
     logging.info('MOOSE Adapter started. Using input file %s and configuration file %s',
-                 os.getenv('CONFIG_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
+                 os.getenv('TEMPLATE_INPUT_FILE_NAME'), os.getenv('CONFIG_FILE_NAME'))
     done = False
     while not done:
         if os.path.exists(os.getenv("QUEUE_FILE_NAME")) and adapter.new_data:

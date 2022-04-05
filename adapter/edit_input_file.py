@@ -150,7 +150,7 @@ def modify_input_file(json_data: list):
         json_data (list): an array of json objects from Deep Lynx
     """
     # Read the file
-    root = pyhit.load(os.getenv('CONFIG_INPUT_FILE_NAME'))
+    root = pyhit.load(os.getenv('TEMPLATE_INPUT_FILE_NAME'))
     # Get nodes
     nodes = list(moosetree.iterate(root, method=moosetree.IterMethod.PRE_ORDER))
 
