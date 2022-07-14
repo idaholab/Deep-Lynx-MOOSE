@@ -90,9 +90,11 @@ Logs will be written to a logfile, stored in the root directory of the project. 
 ## Getting Started
 * Complete the [Poetry installation](https://python-poetry.org/) 
 * All following commands are run in the root directory of the project:
-    * Run `poetry install` to install the defined dependencies for the project.
+    * Run `poetry update` to install the defined dependencies for the project.
     * Run `poetry shell` to spawns a shell.
     * Finally, run the project with the command `flask run`
+
+Logs will be written to a log file, stored in the root directory of the project. The log filename is set in `adapter/__init__.py` and is called `MOOSEAdapter.log`.
 
 ## MOOSE Installation
 * Complete the [MOOSE installation](https://mooseframework.inl.gov/getting_started/installation/)
@@ -104,7 +106,9 @@ The MOOSE Adapter uses the `pyhit` and `moosetree` modules within MOOSE. For mor
 
 ## Contributing
 
-This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes (e.g. `yapf --in-place --recursive . --style={column_limit:120}`)
+This project uses [yapf](https://github.com/google/yapf) for formatting. Please install it and apply formatting before submitting changes.
+1. `poetry shell`
+2. `yapf --in-place --recursive . --style={column_limit:120}`)
 
 ## Helpful Links
 * MOOSE Code
@@ -124,7 +128,7 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 
 [Raw Experiment Open Source Software](https://github.com/IdahoLabResearch)
 
-[Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
+[Unsupported Open Source Software](https://github.com/IdahoLabUnsupported)
 
 ## License
 

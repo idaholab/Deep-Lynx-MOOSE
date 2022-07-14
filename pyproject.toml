@@ -28,6 +28,8 @@ pytest-mock = "*"
 pytest = "*"
 coverage = "*"
 pytest-cov = "*"
+yapf = "*"
+toml = "*"
 
 [build-system]
 requires = ["poetry>=0.12"]
