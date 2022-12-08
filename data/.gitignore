@@ -1,0 +1,9 @@
+# Copyright 2021, Battelle Energy Alliance, LLC
+# Ignore everything in this directory
+*
+# Except these files/directories
+!.gitignore
+!/example
+!/example/*
+!queue/
+!MOOSE_Adapter_Architecture.png
