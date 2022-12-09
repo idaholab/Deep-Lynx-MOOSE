@@ -1,4 +1,4 @@
-name: Deploy Main
+name: Deploy Deep Lynx MOOSE Main
 on:
   workflow_dispatch:
   push:
