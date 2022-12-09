@@ -16,4 +16,4 @@ jobs:
         run: |
           git fetch --unshallow origin
           git remote add github-pub ${{ secrets.PUBLIC_GITHUB_URL }} || git remote set-url github-pub ${{ secrets.PUBLIC_GITHUB_URL }}
-          #git push github-pub main --force
+          git push github-pub main --force
