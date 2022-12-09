@@ -15,5 +15,5 @@ jobs:
         name: mirror-deep-lynx-moose-repo
         run: |
           git fetch --unshallow origin
-          git remote add github-moose-pub ${{ secrets.PUBLIC_GITHUB_URL }} || git remote set-url github-pub ${{ secrets.PUBLIC_GITHUB_URL }}
-          git push github-pub main --force
+          git remote add github-moose-pub ${{ secrets.PUBLIC_GITHUB_URL }} || git remote set-url github-moose-pub ${{ secrets.PUBLIC_GITHUB_URL }}
+          git push github-moose-pub main --force
