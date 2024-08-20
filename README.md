@@ -1,8 +1,8 @@
 # MOOSE Adapter
 
-## Overview of the Deep Lynx MOOSE Adapter
+## Overview of the DeepLynx MOOSE Adapter
 
-The Deep Lynx MOOSE Adapter connects the Deep Lynx data warehouse with any MOOSE executable. A template input file is used to generate a configuration file that specifies the parameters that can be changed in an input file. The Adapter receives events from Deep Lynx, verifies the incoming data with a configuration file, and modifies a template input file for the MOOSE executable. Returns from the MOOSE run are sent back to  [Deep Lynx](https://github.com/idaholab/Deep-Lynx) for use by other applications. 
+The DeepLynx MOOSE Adapter connects the DeepLynx data warehouse with any MOOSE executable. A template input file is used to generate a configuration file that specifies the parameters that can be changed in an input file. The Adapter receives events from DeepLynx, verifies the incoming data with a configuration file, and modifies a template input file for the MOOSE executable. Returns from the MOOSE run are sent back to  [DeepLynx](https://github.com/idaholab/Deep-Lynx) for use by other applications. 
 
 ## Template Parser
 The purpose of the `Template Parser` file is to creates a configuration file that specifies...
@@ -44,7 +44,7 @@ xmax = int
 ```
 
 ## Edit Input File
-The purpose of the `Edit Input File` file is to create the input file to run in MOOSE. The template input file is updated using new incoming data from Deep Lynx. 
+The purpose of the `Edit Input File` file is to create the input file to run in MOOSE. The template input file is updated using new incoming data from DeepLynx. 
 
 ### Steps
 1. Create a configuration file via the `Template Parser`
@@ -56,12 +56,12 @@ The purpose of the `Edit Input File` file is to create the input file to run in 
 ## MOOSE Adapter
 The purpose of the `MOOSE Adapter` file is to run an input file in MOOSE. 
 ### Steps
-1. Receive new data from Deep Lynx
+1. Receive new data from DeepLynx
     * Edit the input file via `Edit Input File` file
 2. Run the input file in MOOSE
     * Inputs: data file and input file
     * Outputs: results file
-3. Imports the results into Deep Lynx
+3. Imports the results into DeepLynx
 
 
 ![MOOSE Adapter Architecture](data/MOOSE_Adapter_Architecture.png)
@@ -69,19 +69,19 @@ The purpose of the `MOOSE Adapter` file is to run an input file in MOOSE.
 ## Environment Variables (.env file)
 
 To run this code, first copy the `.env_sample` file and rename it to `.env`. Several parameters must be present:
-* DEEP_LYNX_URL: The base URL at which calls to Deep Lynx should be sent
-* CONTAINER_NAME: The container name within Deep Lynx
-* DATA_SOURCE_NAME: A name for this data source to be registered with Deep Lynx
-* DATA_SOURCES: A list of Deep Lynx data source names which listens for events
+* DEEP_LYNX_URL: The base URL at which calls to DeepLynx should be sent
+* CONTAINER_NAME: The container name within DeepLynx
+* DATA_SOURCE_NAME: A name for this data source to be registered with DeepLynx
+* DATA_SOURCES: A list of DeepLynx data source names which listens for events
 * TEMPLATE_INPUT_FILE_NAME: The `.i` template input file name to look for
 * CONFIG_FILE_NAME: The `.cfg` configuration file name to look for
 * RUN_FILE_NAME: The `.i` input file name to run in MOOSE
-* QUEUE_FILE_NAME: The name of the queue file that is updated with new data via the Deep Lynx event system
+* QUEUE_FILE_NAME: The name of the queue file that is updated with new data via the DeepLynx event system
 * QUEUE_LENGTH: The maximum length of the queue which updates data in First-In-First-Out (FIFO) data structure
-* METADATA_FILE_NAME: The Deep Lynx metadata file name used in the typemapping system of Deep Lynx
+* METADATA_FILE_NAME: The DeepLynx metadata file name used in the typemapping system of DeepLynx
 * PYTHONPATH: The path to the local MOOSE python folder
 * MOOSE_OPT_PATH: The path to the local MOOSE executable
-* IMPORT_FILE_WAIT_SECONDS: the number of seconds to wait between attempts to find the MOOSE output file to import into Deep Lynx
+* IMPORT_FILE_WAIT_SECONDS: the number of seconds to wait between attempts to find the MOOSE output file to import into DeepLynx
 * REGISTER_WAIT_SECONDS: the number of seconds to wait between attempts to register for events 
 
 
